@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaruLink - ご家族専用ページ</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="portal-body">
+
+  <!-- ログイン画面 -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-icon">🌸</span>
+        <h1>HaruLink</h1>
+        <p>ご家族専用ポータル</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label>パスワード</label>
+          <div class="input-icon-wrap">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="login-pass" placeholder="施設から発行されたパスワード" required>
+            <button type="button" class="toggle-pass" onclick="togglePass('login-pass')"><i class="fa fa-eye"></i></button>
+          </div>
+        </div>
+        <div id="login-error" class="login-error" style="display:none">パスワードが正しくありません</div>
+        <button type="submit" class="btn-login">ログイン <i class="fa fa-arrow-right"></i></button>
+      </form>
+      <div class="login-links">
+        <a href="index.html">スタッフの方はこちら</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- メインポータル -->
+  <div id="app" style="display:none">
+    <header class="portal-header">
+      <div class="logo">
+        <span class="logo-icon">🌸</span>
+        <span>HaruLink</span>
+        <span style="font-size:13px;font-weight:400;opacity:.7;margin-left:8px">ご家族ポータル</span>
+      </div>
+      <div class="portal-user">
+        <div class="avatar" id="family-avatar">家</div>
+        <span id="family-name-display"></span>
+        <button onclick="logout()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;margin-left:12px;cursor:pointer">ログアウト</button>
+      </div>
+    </header>
+
+    <nav class="portal-nav">
+      <div class="portal-nav-item active" data-page="messages" onclick="showPortalPage('messages',this)">
+        <i class="fa fa-comment-dots"></i> メッセージ
+      </div>
+      <div class="portal-nav-item" data-page="visits" onclick="showPortalPage('visits',this)">
+        <i class="fa fa-calendar-check"></i> 面会予約
+      </div>
+      <div class="portal-nav-item" data-page="notices" onclick="showPortalPage('notices',this)">
+        <i class="fa fa-bell"></i> お知らせ
+      </div>
+    </nav>
+
+    <div class="portal-main">
+
+      <!-- メッセージ -->
+      <div class="portal-page active" id="portal-page-messages">
+        <div class="portal-card">
+          <div class="portal-card-header">
+            <h3><i class="fa fa-comment-dots"></i> 担当スタッフとのメッセージ</h3>
+          </div>
+          <div class="chat-wrap" id="family-chat-wrap">
+            <div class="empty-state"><i class="fa fa-comment"></i><p>メッセージはありません</p></div>
+          </div>
+          <div class="chat-input-area">
+            <textarea id="family-msg-input" rows="2" placeholder="メッセージを入力..."></textarea>
+            <button class="chat-send-btn" onclick="familySendMessage()"><i class="fa fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 面会予約 -->
+      <div class="portal-page" id="portal-page-visits">
+        <div class="portal-card">
+          <div class="portal-card-header">
+            <h3><i class="fa fa-calendar-plus"></i> 面会予約申請</h3>
+          </div>
+          <form id="visit-form" class="visit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>希望日 <span class="required">*</span></label>
+                <input type="date" id="v-date" min="">
+              </div>
+              <div class="form-group">
+                <label>希望時間 <span class="required">*</span></label>
+                <select id="v-time">
+                  <option value="10:00">10:00</option>
+                  <option value="11:00">11:00</option>
+                  <option value="13:00">13:00</option>
+                  <option value="14:00">14:00</option>
+                  <option value="15:00">15:00</option>
+                  <option value="16:00">16:00</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>人数 <span class="required">*</span></label>
+                <select id="v-people">
+                  <option value="1">1名</option>
+                  <option value="2">2名</option>
+                  <option value="3">3名</option>
+                  <option value="4">4名</option>
+                  <option value="5">5名以上</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>目的</label>
+                <select id="v-purpose">
+                  <option value="面会">面会</option>
+                  <option value="外出付き添い">外出付き添い</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+            </div>
+            <button type="button" class="btn-primary" onclick="familyRequestVisit()" style="margin-top:8px">
+              <i class="fa fa-paper-plane"></i> 予約申請する
+            </button>
+          </form>
+        </div>
+
+        <div class="portal-card">
+          <div class="portal-card-header">
+            <h3><i class="fa fa-list"></i> 予約履歴</h3>
+          </div>
+          <div id="family-visits-list">
+            <div class="empty-state"><i class="fa fa-calendar"></i><p>予約履歴はありません</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- お知らせ -->
+      <div class="portal-page" id="portal-page-notices">
+        <div class="portal-card">
+          <div class="portal-card-header">
+            <h3><i class="fa fa-bell"></i> 施設からのお知らせ</h3>
+          </div>
+          <div id="family-notices-list">
+            <div class="empty-state"><i class="fa fa-bell-slash"></i><p>お知らせはありません</p></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="family.js"></script>
+</body>
+</html>

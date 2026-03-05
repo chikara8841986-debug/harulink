@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaruLink - ケアマネ専用ページ</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="portal-body">
+
+  <!-- ログイン画面 -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-icon">🌸</span>
+        <h1>HaruLink</h1>
+        <p>ケアマネ専用ポータル</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label>パスワード</label>
+          <div class="input-icon-wrap">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="login-pass" placeholder="施設から発行されたパスワード" required>
+            <button type="button" class="toggle-pass" onclick="togglePass('login-pass')"><i class="fa fa-eye"></i></button>
+          </div>
+        </div>
+        <div id="login-error" class="login-error" style="display:none">パスワードが正しくありません</div>
+        <button type="submit" class="btn-login">ログイン <i class="fa fa-arrow-right"></i></button>
+      </form>
+      <div class="login-links">
+        <a href="index.html">スタッフの方はこちら</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- メインポータル -->
+  <div id="app" style="display:none">
+    <header class="portal-header">
+      <div class="logo">
+        <span class="logo-icon">🌸</span>
+        <span>HaruLink</span>
+        <span style="font-size:13px;font-weight:400;opacity:.7;margin-left:8px">ケアマネポータル</span>
+      </div>
+      <div class="portal-user">
+        <div class="avatar" id="cm-avatar">ケ</div>
+        <div>
+          <div id="cm-name-display" style="font-size:13px;font-weight:600"></div>
+          <div id="cm-org-display" style="font-size:11px;opacity:.7"></div>
+        </div>
+        <button onclick="logout()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;margin-left:12px;cursor:pointer">ログアウト</button>
+      </div>
+    </header>
+
+    <div class="portal-main">
+      <div class="portal-card" style="margin-bottom:0">
+        <div class="portal-card-header">
+          <h3><i class="fa fa-comments"></i> 施設管理者とのメッセージ</h3>
+          <span style="font-size:12px;color:var(--gray-400)" id="cm-last-updated"></span>
+        </div>
+
+        <div class="chat-wrap" id="cm-chat-wrap">
+          <div class="empty-state"><i class="fa fa-comment"></i><p>メッセージはありません</p></div>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea id="cm-msg-input" rows="2" placeholder="施設への連絡内容を入力..."></textarea>
+          <button class="chat-send-btn" onclick="cmSendMessage()"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="caremanager.js"></script>
+</body>
+</html>
