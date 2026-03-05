@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaruLink</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🌱 HaruLink</h1>
+    <span>施設と家族をつなぐ、Haruのおたより</span>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" data-page="home">ホーム</button>
+    <button class="nav-btn" data-page="message">メッセージ</button>
+    <button class="nav-btn" data-page="broadcast">一斉通知</button>
+    <button class="nav-btn" data-page="visit">面会予約</button>
+    <button class="nav-btn" data-page="suspend">面会中止設定</button>
+    <button class="nav-btn" data-page="caremanager">ケアマネ連絡</button>
+  </nav>
+
+  <main>
+
+    <!-- ホーム -->
+    <div id="page-home" class="page active">
+      <h2>ダッシュボード</h2>
+      <div class="grid2">
+        <div class="card center">
+          <div class="stat-num pink" id="stat-unread">-</div>
+          <div class="stat-label">未読メッセージ</div>
+        </div>
+        <div class="card center">
+          <div class="stat-num orange" id="stat-pending">-</div>
+          <div class="stat-label">面会予約承認待ち</div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="welcome-text">🌱 HaruLink 初期版へようこそ。<br>上のメニューから各機能をご利用いただけます。</p>
+      </div>
+    </div>
+
+    <!-- メッセージ -->
+    <div id="page-message" class="page">
+      <h2>メッセージ</h2>
+      <div class="card">
+        <label>送信者ID</label>
+        <input id="s_sender" placeholder="例：STAFF001">
+        <label>送信者種別</label>
+        <select id="s_stype"><option>職員</option><option>家族</option></select>
+        <label>受信者ID</label>
+        <input id="s_receiver" placeholder="例：FAM001">
+        <label>受信者種別</label>
+        <select id="s_rtype"><option>家族</option><option>職員</option></select>
+        <label>メッセージ</label>
+        <textarea id="s_body" rows="3" placeholder="メッセージを入力"></textarea>
+        <button class="btn btn-primary" onclick="sendMessage()">送信する</button>
+      </div>
+      <div class="card">
+        <h3 class="list-title">最近のメッセージ（最新20件）</h3>
+        <div id="msg-list"><div class="loading">読み込み中...</div></div>
+      </div>
+    </div>
+
+    <!-- 一斉通知 -->
+    <div id="page-broadcast" class="page">
+      <h2>一斉通知</h2>
+      <div class="card">
+        <label>件名</label>
+        <input id="bc_title" placeholder="例：面会時間変更のお知らせ">
+        <label>本文</label>
+        <textarea id="bc_body" rows="3" placeholder="家族全員へ送信するメッセージ"></textarea>
+        <label>部署フィルター（空白で全員）</label>
+        <input id="bc_dept" placeholder="例：1階">
+        <button class="btn btn-primary" onclick="sendBroadcast()">一斉送信する</button>
+      </div>
+      <div class="card">
+        <h3 class="list-title">送信履歴（最新10件）</h3>
+        <div id="bc-list"><div class="loading">読み込み中...</div></div>
+      </div>
+    </div>
+
+    <!-- 面会予約 -->
+    <div id="page-visit" class="page">
+      <h2>面会予約</h2>
+      <div class="card">
+        <label>家族ID</label>
+        <input id="v_family" placeholder="例：FAM001">
+        <label>利用者ID</label>
+        <input id="v_user" placeholder="例：USER001">
+        <label>希望日</label>
+        <input type="date" id="v_date">
+        <label>希望時間</label>
+        <input type="time" id="v_time">
+        <label>備考</label>
+        <input id="v_note" placeholder="例：兄弟も一緒に来ます">
+        <button class="btn btn-primary" onclick="requestVisit()">面会申請する</button>
+      </div>
+      <div class="card">
+        <h3 class="list-title">面会予約一覧</h3>
+        <div id="visit-list"><div class="loading">読み込み中...</div></div>
+      </div>
+    </div>
+
+    <!-- 面会中止設定 -->
+    <div id="page-suspend" class="page">
+      <h2>面会中止期間設定</h2>
+      <div class="card">
+        <label>開始日</label>
+        <input type="date" id="sp_start">
+        <label>終了日</label>
+        <input type="date" id="sp_end">
+        <label>理由</label>
+        <input id="sp_reason" placeholder="例：インフルエンザ流行のため">
+        <button class="btn btn-danger" onclick="setSuspend()">面会中止期間を設定する</button>
+      </div>
+      <div class="card">
+        <h3 class="list-title">設定履歴</h3>
+        <div id="suspend-list"><div class="loading">読み込み中...</div></div>
+      </div>
+    </div>
+
+    <!-- ケアマネ連絡 -->
+    <div id="page-caremanager" class="page">
+      <h2>ケアマネ連絡（一斉メール）</h2>
+      <div class="card">
+        <label>件名</label>
+        <input id="cm_title" placeholder="例：インフルエンザ流行のお知らせ">
+        <label>本文</label>
+        <textarea id="cm_body" rows="5" placeholder="ケアマネへ送信するメール本文を入力"></textarea>
+        <label>対象利用者ID（空白で全ケアマネ）</label>
+        <input id="cm_user" placeholder="例：USER001">
+        <button class="btn btn-secondary" onclick="sendCareManager()">メールを送信する</button>
+      </div>
+      <div class="alert alert-warning">
+        ⚠️ 送信前にケアマネマスタのメールアドレスが正しいか確認してください。
+      </div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
