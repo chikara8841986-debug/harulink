@@ -2,7 +2,7 @@
 // HaruLink フロントエンド
 // GASのURLをここに設定してください
 // =============================================
-const GAS_URL = 'ここにGASのデプロイURLを貼り付けてください';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxDjkUXCAxHeyKH-j0iNwB2OoWEAizP094vrUynWOyW9TOUFNqXdPeDCZ2AqNzz0F4Swg/exec';
 
 // =============================================
 // ページ切り替え
