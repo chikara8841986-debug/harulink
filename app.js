@@ -16,11 +16,12 @@ var appData = {
 // API通信
 // ============================================================
 function callAPI(action, params) {
-  return fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: action, params: params || {} })
-  })
+  var qs = 'action=' + encodeURIComponent(action);
+  var p = params || {};
+  Object.keys(p).forEach(function(k) {
+    qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
+  });
+  return fetch(GAS_URL + '?' + qs)
   .then(function(res) { return res.json(); })
   .then(function(data) {
     if (data.error) throw new Error(data.error);
@@ -60,7 +61,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
   errEl.style.display = 'none';
   showLoading();
 
-  callAPI('loginStaff', { id: id, password: pass })
+  callAPI('loginStaff', { userId: id, password: pass })
     .then(function(data) {
       hideLoading();
       if (data.success && data.user) {
