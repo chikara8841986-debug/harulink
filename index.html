@@ -3,142 +3,736 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HaruLink</title>
+  <title>HaruLink - æ½è¨­ç®¡çã·ã¹ãã </title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-  <header>
-    <h1>🌱 HaruLink</h1>
-    <span>施設と家族をつなぐ、Haruのおたより</span>
-  </header>
+<body class="staff-body">
 
-  <nav>
-    <button class="nav-btn active" data-page="home">ホーム</button>
-    <button class="nav-btn" data-page="message">メッセージ</button>
-    <button class="nav-btn" data-page="broadcast">一斉通知</button>
-    <button class="nav-btn" data-page="visit">面会予約</button>
-    <button class="nav-btn" data-page="suspend">面会中止設定</button>
-    <button class="nav-btn" data-page="caremanager">ケアマネ連絡</button>
-  </nav>
-
-  <main>
-
-    <!-- ホーム -->
-    <div id="page-home" class="page active">
-      <h2>ダッシュボード</h2>
-      <div class="grid2">
-        <div class="card center">
-          <div class="stat-num pink" id="stat-unread">-</div>
-          <div class="stat-label">未読メッセージ</div>
+  <!-- ã­ã°ã¤ã³ç»é¢ -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-icon">ð¸</span>
+        <h1>HaruLink</h1>
+        <p>æ½è¨­ã¹ã¿ããå°ç¨ã­ã°ã¤ã³</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label>ã¹ã¿ããID</label>
+          <div class="input-icon-wrap">
+            <i class="fa fa-user"></i>
+            <input type="text" id="login-id" placeholder="ã¹ã¿ããIDãå¥å" required>
+          </div>
         </div>
-        <div class="card center">
-          <div class="stat-num orange" id="stat-pending">-</div>
-          <div class="stat-label">面会予約承認待ち</div>
+        <div class="form-group">
+          <label>ãã¹ã¯ã¼ã</label>
+          <div class="input-icon-wrap">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="login-pass" placeholder="ãã¹ã¯ã¼ããå¥å" required>
+            <button type="button" class="toggle-pass" onclick="togglePass('login-pass')"><i class="fa fa-eye"></i></button>
+          </div>
+        </div>
+        <div id="login-error" class="login-error" style="display:none">IDã¾ãã¯ãã¹ã¯ã¼ããæ­£ããããã¾ãã</div>
+        <button type="submit" class="btn-login">ã­ã°ã¤ã³ <i class="fa fa-arrow-right"></i></button>
+      </form>
+      <div class="login-links">
+        <a href="family.html">å®¶æã®æ¹ã¯ãã¡ã</a>
+        <a href="caremanager.html">ã±ã¢ããã®æ¹ã¯ãã¡ã</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ã¡ã¤ã³ã¢ããª -->
+  <div id="app" class="app" style="display:none">
+
+    <!-- ãµã¤ããã¼ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-icon">ð¸</span>
+        <span class="logo-text">HaruLink</span>
+        <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()"><i class="fa fa-chevron-left"></i></button>
+      </div>
+
+      <div class="staff-info-bar">
+        <div class="staff-avatar" id="staff-avatar">S</div>
+        <div class="staff-detail">
+          <div class="staff-name" id="staff-name-display">ã¹ã¿ããå</div>
+          <div class="staff-role-badge" id="staff-role-badge">ä¸è¬è·å¡</div>
         </div>
       </div>
-      <div class="card">
-        <p class="welcome-text">🌱 HaruLink 初期版へようこそ。<br>上のメニューから各機能をご利用いただけます。</p>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">ã¡ã¤ã³</div>
+        <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
+          <i class="fa fa-home"></i><span>ããã·ã¥ãã¼ã</span>
+        </a>
+        <a class="nav-item" data-page="messages" onclick="showPage('messages', this)">
+          <i class="fa fa-comment-dots"></i><span>ã¡ãã»ã¼ã¸</span>
+          <span class="nav-badge" id="badge-messages" style="display:none">0</span>
+        </a>
+        <a class="nav-item" data-page="visits" onclick="showPage('visits', this)">
+          <i class="fa fa-calendar-check"></i><span>é¢ä¼äºç´</span>
+          <span class="nav-badge" id="badge-visits" style="display:none">0</span>
+        </a>
+        <a class="nav-item" data-page="caremanager-msg" onclick="showPage('caremanager-msg', this)">
+          <i class="fa fa-briefcase-medical"></i><span>ã±ã¢ããé£çµ¡</span>
+        </a>
+
+        <div class="nav-section-label nav-admin-only">æ½è¨­ç®¡ç</div>
+        <a class="nav-item nav-admin-only" data-page="broadcast" onclick="showPage('broadcast', this)">
+          <i class="fa fa-bullhorn"></i><span>ä¸æéç¥</span>
+        </a>
+        <a class="nav-item nav-admin-only" data-page="suspend" onclick="showPage('suspend', this)">
+          <i class="fa fa-ban"></i><span>é¢ä¼ä¸­æ­¢è¨­å®</span>
+        </a>
+
+        <div class="nav-section-label nav-admin-only">ãã¹ã¿ç®¡ç</div>
+        <a class="nav-item nav-admin-only" data-page="residents" onclick="showPage('residents', this)">
+          <i class="fa fa-users"></i><span>å©ç¨èç®¡ç</span>
+        </a>
+        <a class="nav-item nav-admin-only" data-page="families" onclick="showPage('families', this)">
+          <i class="fa fa-heart"></i><span>å®¶æç®¡ç</span>
+        </a>
+        <a class="nav-item nav-admin-only" data-page="caremanagers" onclick="showPage('caremanagers', this)">
+          <i class="fa fa-id-card"></i><span>ã±ã¢ããç®¡ç</span>
+        </a>
+        <a class="nav-item nav-admin-only" data-page="staff" onclick="showPage('staff', this)">
+          <i class="fa fa-user-nurse"></i><span>ã¹ã¿ããç®¡ç</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="logout()">
+          <i class="fa fa-sign-out-alt"></i><span>ã­ã°ã¢ã¦ã</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ã¡ã¤ã³ã³ã³ãã³ã -->
+    <main class="main-content" id="main-content">
+
+      <!-- ããããã¼ -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+          <div class="breadcrumb">
+            <span class="breadcrumb-app">HaruLink</span>
+            <i class="fa fa-chevron-right"></i>
+            <span class="page-title" id="page-title">ããã·ã¥ãã¼ã</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-date" id="topbar-date"></div>
+          <button class="topbar-icon-btn" onclick="loadAll()" title="ãã¼ã¿æ´æ°">
+            <i class="fa fa-sync-alt"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ã­ã¼ãã£ã³ã° -->
+      <div class="loading-overlay" id="loading-overlay" style="display:none">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- ========== ããã·ã¥ãã¼ã ========== -->
+      <div class="page active" id="page-dashboard">
+        <div class="dashboard-greeting" id="dashboard-greeting"></div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card" style="--kpi-color:#3B82F6">
+            <div class="kpi-icon"><i class="fa fa-comment-dots"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-unread">â</div>
+              <div class="kpi-label">æªèª­ã¡ãã»ã¼ã¸</div>
+            </div>
+            <div class="kpi-arrow" onclick="showPage('messages',null)"><i class="fa fa-chevron-right"></i></div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#F59E0B">
+            <div class="kpi-icon"><i class="fa fa-calendar-check"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-pending-visits">â</div>
+              <div class="kpi-label">é¢ä¼ç³è«ä¸­</div>
+            </div>
+            <div class="kpi-arrow" onclick="showPage('visits',null)"><i class="fa fa-chevron-right"></i></div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#10B981">
+            <div class="kpi-icon"><i class="fa fa-users"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-residents">â</div>
+              <div class="kpi-label">ç»é²å©ç¨èæ°</div>
+            </div>
+            <div class="kpi-arrow" onclick="showPage('residents',null)"><i class="fa fa-chevron-right"></i></div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#8B5CF6">
+            <div class="kpi-icon"><i class="fa fa-calendar-day"></i></div>
+            <div class="kpi-body">
+              <div class="kpi-value" id="kpi-today-visits">â</div>
+              <div class="kpi-label">æ¬æ¥ã®é¢ä¼</div>
+            </div>
+            <div class="kpi-arrow" onclick="showPage('visits',null)"><i class="fa fa-chevron-right"></i></div>
+          </div>
+        </div>
+
+        <div class="dashboard-panels">
+          <div class="panel">
+            <div class="panel-header">
+              <span><i class="fa fa-comment-dots"></i> ææ°ã¡ãã»ã¼ã¸</span>
+              <button class="btn-link" onclick="showPage('messages',null)">ãã¹ã¦è¦ã <i class="fa fa-arrow-right"></i></button>
+            </div>
+            <div class="panel-body" id="dashboard-messages">
+              <div class="empty-state"><i class="fa fa-inbox"></i><p>ã¡ãã»ã¼ã¸ã¯ããã¾ãã</p></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <span><i class="fa fa-calendar-check"></i> ç³è«ä¸­ã®é¢ä¼äºç´</span>
+              <button class="btn-link" onclick="showPage('visits',null)">ãã¹ã¦è¦ã <i class="fa fa-arrow-right"></i></button>
+            </div>
+            <div class="panel-body" id="dashboard-visits">
+              <div class="empty-state"><i class="fa fa-calendar"></i><p>ç³è«ä¸­ã®äºç´ã¯ããã¾ãã</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ã¡ãã»ã¼ã¸ ========== -->
+      <div class="page" id="page-messages">
+        <div class="page-header">
+          <h2><i class="fa fa-comment-dots"></i> ã¡ãã»ã¼ã¸</h2>
+          <button class="btn-primary" onclick="openModal('modal-send-message')">
+            <i class="fa fa-plus"></i> æ°è¦ã¡ãã»ã¼ã¸
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" class="search-input" id="msg-search" placeholder="éä¿¡èã»åä¿¡èã»åå®¹ã§æ¤ç´¢..." oninput="filterMessages()">
+          </div>
+          <select class="filter-select" id="msg-filter" onchange="filterMessages()">
+            <option value="">ãã¹ã¦</option>
+            <option value="æªèª­">æªèª­ã®ã¿</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:60px">ç¶æ</th>
+                <th>éä¿¡è</th>
+                <th>åä¿¡è</th>
+                <th>åå®¹</th>
+                <th style="width:150px">éä¿¡æ¥æ</th>
+              </tr>
+            </thead>
+            <tbody id="messages-tbody">
+              <tr><td colspan="5" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== é¢ä¼äºç´ ========== -->
+      <div class="page" id="page-visits">
+        <div class="page-header">
+          <h2><i class="fa fa-calendar-check"></i> é¢ä¼äºç´ç®¡ç</h2>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" class="search-input" id="visit-search" placeholder="ç³è«èã»å©ç¨èåã§æ¤ç´¢..." oninput="filterVisits()">
+          </div>
+          <select class="filter-select" id="visit-filter" onchange="filterVisits()">
+            <option value="">ãã¹ã¦</option>
+            <option value="ç³è«ä¸­">ç³è«ä¸­</option>
+            <option value="æ¿èª">æ¿èªæ¸</option>
+            <option value="å´ä¸">å´ä¸</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:90px">ã¹ãã¼ã¿ã¹</th>
+                <th>ç³è«è</th>
+                <th>å©ç¨èå</th>
+                <th>å¸ææ¥</th>
+                <th>å¸ææé</th>
+                <th style="width:40px">äººæ°</th>
+                <th>ç®ç</th>
+                <th style="width:150px">ç³è«æ¥æ</th>
+                <th style="width:140px">æä½</th>
+              </tr>
+            </thead>
+            <tbody id="visits-tbody">
+              <tr><td colspan="9" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== ã±ã¢ããé£çµ¡ ========== -->
+      <div class="page" id="page-caremanager-msg">
+        <div class="page-header">
+          <h2><i class="fa fa-briefcase-medical"></i> ã±ã¢ããé£çµ¡</h2>
+          <button class="btn-primary" onclick="openModal('modal-caremanager-msg')">
+            <i class="fa fa-plus"></i> æ°è¦é£çµ¡
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:60px">ç¶æ</th>
+                <th>ã±ã¢ããå</th>
+                <th>ä»¶å</th>
+                <th>åå®¹</th>
+                <th style="width:150px">éä¿¡æ¥æ</th>
+              </tr>
+            </thead>
+            <tbody id="caremanager-msg-tbody">
+              <tr><td colspan="5" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== ä¸æéç¥ï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <div class="page" id="page-broadcast">
+        <div class="page-header">
+          <h2><i class="fa fa-bullhorn"></i> ä¸æéç¥</h2>
+          <button class="btn-primary" onclick="openModal('modal-broadcast')">
+            <i class="fa fa-plus"></i> æ°è¦éç¥ä½æ
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>ã¿ã¤ãã«</th><th>å¯¾è±¡</th><th style="width:150px">éä¿¡æ¥æ</th><th>æ¬æ</th></tr>
+            </thead>
+            <tbody id="broadcast-tbody">
+              <tr><td colspan="4" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== é¢ä¼ä¸­æ­¢è¨­å®ï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <div class="page" id="page-suspend">
+        <div class="page-header">
+          <h2><i class="fa fa-ban"></i> é¢ä¼ä¸­æ­¢è¨­å®</h2>
+          <button class="btn-primary" onclick="openModal('modal-suspend')">
+            <i class="fa fa-plus"></i> æ°è¦è¨­å®
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>éå§æ¥</th><th>çµäºæ¥</th><th>çç±</th><th style="width:150px">è¨­å®æ¥æ</th></tr>
+            </thead>
+            <tbody id="suspend-tbody">
+              <tr><td colspan="4" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== å©ç¨èç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <div class="page" id="page-residents">
+        <div class="page-header">
+          <h2><i class="fa fa-users"></i> å©ç¨èç®¡ç</h2>
+          <button class="btn-primary" onclick="openModal('modal-add-resident')">
+            <i class="fa fa-plus"></i> å©ç¨èç»é²
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" class="search-input" id="resident-search" placeholder="æ°åã»é¨å±çªå·ã§æ¤ç´¢..." oninput="filterResidents()">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>å©ç¨èID</th><th>æ°å</th><th>é¨å±çªå·</th><th>å¥å±æ¥</th><th>æå½ã¹ã¿ãã</th><th style="width:100px">æä½</th></tr>
+            </thead>
+            <tbody id="residents-tbody">
+              <tr><td colspan="6" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== å®¶æç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <div class="page" id="page-families">
+        <div class="page-header">
+          <h2><i class="fa fa-heart"></i> å®¶æç®¡ç</h2>
+          <button class="btn-primary" onclick="openModal('modal-add-family')">
+            <i class="fa fa-plus"></i> å®¶æç»é²
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" class="search-input" id="family-search" placeholder="æ°åã»å©ç¨èåã§æ¤ç´¢..." oninput="filterFamilies()">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>å®¶æID</th><th>æ°å</th><th>ç¶æ</th><th>å©ç¨èå</th><th>ã¡ã¼ã«</th><th>ãã¹ã¯ã¼ã</th><th style="width:100px">æä½</th></tr>
+            </thead>
+            <tbody id="families-tbody">
+              <tr><td colspan="7" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== ã±ã¢ããç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <div class="page" id="page-caremanagers">
+        <div class="page-header">
+          <h2><i class="fa fa-id-card"></i> ã±ã¢ããç®¡ç</h2>
+          <button class="btn-primary" onclick="openModal('modal-add-caremanager')">
+            <i class="fa fa-plus"></i> ã±ã¢ããç»é²
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" class="search-input" id="cm-search" placeholder="æ°åã»æå±ã§æ¤ç´¢..." oninput="filterCareManagers()">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>ã±ã¢ããID</th><th>æ°å</th><th>æå±</th><th>ã¡ã¼ã«</th><th>ãã¹ã¯ã¼ã</th><th style="width:100px">æä½</th></tr>
+            </thead>
+            <tbody id="caremanagers-tbody">
+              <tr><td colspan="6" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== ã¹ã¿ããç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <div class="page" id="page-staff">
+        <div class="page-header">
+          <h2><i class="fa fa-user-nurse"></i> ã¹ã¿ããç®¡ç</h2>
+          <button class="btn-primary" onclick="openModal('modal-add-staff')">
+            <i class="fa fa-plus"></i> ã¹ã¿ããç»é²
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>ã¹ã¿ããID</th><th>æ°å</th><th>æ¨©é</th><th>æå½é¨é</th><th style="width:100px">æä½</th></tr>
+            </thead>
+            <tbody id="staff-tbody">
+              <tr><td colspan="5" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ========== ã¢ã¼ãã«ç¾¤ ========== -->
+
+  <!-- ã¡ãã»ã¼ã¸éä¿¡ -->
+  <div class="modal-overlay" id="modal-send-message">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa fa-comment-dots"></i> æ°è¦ã¡ãã»ã¼ã¸</h3>
+        <button class="modal-close" onclick="closeModal('modal-send-message')"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>åä¿¡è <span class="required">*</span></label>
+          <input type="text" id="msg-receiver" placeholder="åä¿¡èåãå¥å">
+        </div>
+        <div class="form-group">
+          <label>ã¡ãã»ã¼ã¸åå®¹ <span class="required">*</span></label>
+          <textarea id="msg-body" rows="5" placeholder="ã¡ãã»ã¼ã¸ãå¥åãã¦ãã ãã"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-send-message')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="sendMessage()"><i class="fa fa-paper-plane"></i> éä¿¡</button>
       </div>
     </div>
+  </div>
 
-    <!-- メッセージ -->
-    <div id="page-message" class="page">
-      <h2>メッセージ</h2>
-      <div class="card">
-        <label>送信者ID</label>
-        <input id="s_sender" placeholder="例：STAFF001">
-        <label>送信者種別</label>
-        <select id="s_stype"><option>職員</option><option>家族</option></select>
-        <label>受信者ID</label>
-        <input id="s_receiver" placeholder="例：FAM001">
-        <label>受信者種別</label>
-        <select id="s_rtype"><option>家族</option><option>職員</option></select>
-        <label>メッセージ</label>
-        <textarea id="s_body" rows="3" placeholder="メッセージを入力"></textarea>
-        <button class="btn btn-primary" onclick="sendMessage()">送信する</button>
+  <!-- ä¸æéç¥ -->
+  <div class="modal-overlay" id="modal-broadcast">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa fa-bullhorn"></i> ä¸æéç¥ä½æ</h3>
+        <button class="modal-close" onclick="closeModal('modal-broadcast')"><i class="fa fa-times"></i></button>
       </div>
-      <div class="card">
-        <h3 class="list-title">最近のメッセージ（最新20件）</h3>
-        <div id="msg-list"><div class="loading">読み込み中...</div></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>ã¿ã¤ãã« <span class="required">*</span></label>
+          <input type="text" id="bc-title" placeholder="éç¥ã¿ã¤ãã«ãå¥å">
+        </div>
+        <div class="form-group">
+          <label>å¯¾è±¡</label>
+          <select id="bc-target">
+            <option value="å¨å¡">å¨å¡</option>
+            <option value="å®¶æ">å®¶æã®ã¿</option>
+            <option value="ã±ã¢ãã">ã±ã¢ããã®ã¿</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>æ¬æ <span class="required">*</span></label>
+          <textarea id="bc-body" rows="5" placeholder="éç¥åå®¹ãå¥åãã¦ãã ãã"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-broadcast')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="sendBroadcast()"><i class="fa fa-bullhorn"></i> éä¿¡</button>
       </div>
     </div>
+  </div>
 
-    <!-- 一斉通知 -->
-    <div id="page-broadcast" class="page">
-      <h2>一斉通知</h2>
-      <div class="card">
-        <label>件名</label>
-        <input id="bc_title" placeholder="例：面会時間変更のお知らせ">
-        <label>本文</label>
-        <textarea id="bc_body" rows="3" placeholder="家族全員へ送信するメッセージ"></textarea>
-        <label>部署フィルター（空白で全員）</label>
-        <input id="bc_dept" placeholder="例：1階">
-        <button class="btn btn-primary" onclick="sendBroadcast()">一斉送信する</button>
+  <!-- é¢ä¼ä¸­æ­¢è¨­å® -->
+  <div class="modal-overlay" id="modal-suspend">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa fa-ban"></i> é¢ä¼ä¸­æ­¢è¨­å®</h3>
+        <button class="modal-close" onclick="closeModal('modal-suspend')"><i class="fa fa-times"></i></button>
       </div>
-      <div class="card">
-        <h3 class="list-title">送信履歴（最新10件）</h3>
-        <div id="bc-list"><div class="loading">読み込み中...</div></div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>éå§æ¥ <span class="required">*</span></label>
+            <input type="date" id="suspend-start">
+          </div>
+          <div class="form-group">
+            <label>çµäºæ¥ <span class="required">*</span></label>
+            <input type="date" id="suspend-end">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>çç±</label>
+          <textarea id="suspend-reason" rows="3" placeholder="é¢ä¼ä¸­æ­¢ã®çç±ãå¥åãã¦ãã ãã"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-suspend')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-danger" onclick="setSuspend()"><i class="fa fa-ban"></i> è¨­å®ãã</button>
       </div>
     </div>
+  </div>
 
-    <!-- 面会予約 -->
-    <div id="page-visit" class="page">
-      <h2>面会予約</h2>
-      <div class="card">
-        <label>家族ID</label>
-        <input id="v_family" placeholder="例：FAM001">
-        <label>利用者ID</label>
-        <input id="v_user" placeholder="例：USER001">
-        <label>希望日</label>
-        <input type="date" id="v_date">
-        <label>希望時間</label>
-        <input type="time" id="v_time">
-        <label>備考</label>
-        <input id="v_note" placeholder="例：兄弟も一緒に来ます">
-        <button class="btn btn-primary" onclick="requestVisit()">面会申請する</button>
+  <!-- ã±ã¢ããé£çµ¡ -->
+  <div class="modal-overlay" id="modal-caremanager-msg">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa fa-briefcase-medical"></i> ã±ã¢ããã¸ã®é£çµ¡</h3>
+        <button class="modal-close" onclick="closeModal('modal-caremanager-msg')"><i class="fa fa-times"></i></button>
       </div>
-      <div class="card">
-        <h3 class="list-title">面会予約一覧</h3>
-        <div id="visit-list"><div class="loading">読み込み中...</div></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>éä¿¡åã±ã¢ãã <span class="required">*</span></label>
+          <select id="cm-msg-target">
+            <option value="">é¸æãã¦ãã ãã</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ä»¶å <span class="required">*</span></label>
+          <input type="text" id="cm-msg-subject" placeholder="ä»¶åãå¥å">
+        </div>
+        <div class="form-group">
+          <label>æ¬æ <span class="required">*</span></label>
+          <textarea id="cm-msg-body" rows="5" placeholder="é£çµ¡åå®¹ãå¥åãã¦ãã ãã"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-caremanager-msg')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="sendCareManagerMsg()"><i class="fa fa-paper-plane"></i> éä¿¡</button>
       </div>
     </div>
+  </div>
 
-    <!-- 面会中止設定 -->
-    <div id="page-suspend" class="page">
-      <h2>面会中止期間設定</h2>
-      <div class="card">
-        <label>開始日</label>
-        <input type="date" id="sp_start">
-        <label>終了日</label>
-        <input type="date" id="sp_end">
-        <label>理由</label>
-        <input id="sp_reason" placeholder="例：インフルエンザ流行のため">
-        <button class="btn btn-danger" onclick="setSuspend()">面会中止期間を設定する</button>
+  <!-- å©ç¨èç»é² -->
+  <div class="modal-overlay" id="modal-add-resident">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa fa-users"></i> å©ç¨èç»é²</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-resident')"><i class="fa fa-times"></i></button>
       </div>
-      <div class="card">
-        <h3 class="list-title">設定履歴</h3>
-        <div id="suspend-list"><div class="loading">読み込み中...</div></div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>æ°å <span class="required">*</span></label>
+            <input type="text" id="res-name" placeholder="å±±ç° å¤ªé">
+          </div>
+          <div class="form-group">
+            <label>é¨å±çªå· <span class="required">*</span></label>
+            <input type="text" id="res-room" placeholder="101">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>å¥å±æ¥</label>
+            <input type="date" id="res-date">
+          </div>
+          <div class="form-group">
+            <label>æå½ã¹ã¿ãã</label>
+            <select id="res-staff">
+              <option value="">é¸æãã¦ãã ãã</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-add-resident')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="addResident()"><i class="fa fa-save"></i> ç»é²</button>
       </div>
     </div>
+  </div>
 
-    <!-- ケアマネ連絡 -->
-    <div id="page-caremanager" class="page">
-      <h2>ケアマネ連絡（一斉メール）</h2>
-      <div class="card">
-        <label>件名</label>
-        <input id="cm_title" placeholder="例：インフルエンザ流行のお知らせ">
-        <label>本文</label>
-        <textarea id="cm_body" rows="5" placeholder="ケアマネへ送信するメール本文を入力"></textarea>
-        <label>対象利用者ID（空白で全ケアマネ）</label>
-        <input id="cm_user" placeholder="例：USER001">
-        <button class="btn btn-secondary" onclick="sendCareManager()">メールを送信する</button>
+  <!-- å®¶æç»é² -->
+  <div class="modal-overlay" id="modal-add-family">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa fa-heart"></i> å®¶æç»é²</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-family')"><i class="fa fa-times"></i></button>
       </div>
-      <div class="alert alert-warning">
-        ⚠️ 送信前にケアマネマスタのメールアドレスが正しいか確認してください。
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>æ°å <span class="required">*</span></label>
+            <input type="text" id="fam-name" placeholder="å±±ç° è±å­">
+          </div>
+          <div class="form-group">
+            <label>ç¶æ <span class="required">*</span></label>
+            <select id="fam-relation">
+              <option value="é·ç·">é·ç·</option>
+              <option value="é·å¥³">é·å¥³</option>
+              <option value="æ¬¡ç·">æ¬¡ç·</option>
+              <option value="æ¬¡å¥³">æ¬¡å¥³</option>
+              <option value="éå¶è">éå¶è</option>
+              <option value="ãã®ä»">ãã®ä»</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>å¯¾è±¡å©ç¨è <span class="required">*</span></label>
+          <select id="fam-resident">
+            <option value="">é¸æãã¦ãã ãã</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ãã¹ã¯ã¼ã <span class="required">*</span></label>
+            <div class="input-with-btn">
+              <input type="text" id="fam-pass" placeholder="ãã¹ã¯ã¼ããè¨­å®">
+              <button type="button" class="btn-gen-pass" onclick="generatePass('fam-pass')"><i class="fa fa-random"></i> èªåçæ</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ã¡ã¼ã«ã¢ãã¬ã¹</label>
+            <input type="email" id="fam-email" placeholder="example@mail.com">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-add-family')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="addFamily()"><i class="fa fa-save"></i> ç»é²</button>
       </div>
     </div>
+  </div>
 
-  </main>
+  <!-- ã±ã¢ããç»é² -->
+  <div class="modal-overlay" id="modal-add-caremanager">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa fa-id-card"></i> ã±ã¢ããç»é²</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-caremanager')"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>æ°å <span class="required">*</span></label>
+            <input type="text" id="cm-name" placeholder="é´æ¨ ä¸é">
+          </div>
+          <div class="form-group">
+            <label>æå±äºæ¥­æ <span class="required">*</span></label>
+            <input type="text" id="cm-org" placeholder="ããã±ã¢ãã©ã³ã»ã³ã¿ã¼">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ãã¹ã¯ã¼ã <span class="required">*</span></label>
+            <div class="input-with-btn">
+              <input type="text" id="cm-pass" placeholder="ãã¹ã¯ã¼ããè¨­å®">
+              <button type="button" class="btn-gen-pass" onclick="generatePass('cm-pass')"><i class="fa fa-random"></i> èªåçæ</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ã¡ã¼ã«ã¢ãã¬ã¹</label>
+            <input type="email" id="cm-email" placeholder="example@mail.com">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-add-caremanager')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="addCareManager()"><i class="fa fa-save"></i> ç»é²</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ã¹ã¿ããç»é² -->
+  <div class="modal-overlay" id="modal-add-staff">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa fa-user-nurse"></i> ã¹ã¿ããç»é²</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-staff')"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>ã¹ã¿ããID <span class="required">*</span></label>
+            <input type="text" id="st-id" placeholder="staff001">
+          </div>
+          <div class="form-group">
+            <label>æ°å <span class="required">*</span></label>
+            <input type="text" id="st-name" placeholder="ç°ä¸­ æ¬¡é">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>æ¨©é <span class="required">*</span></label>
+            <select id="st-role">
+              <option value="ä¸è¬è·å¡">ä¸è¬è·å¡</option>
+              <option value="ç®¡çè">ç®¡çè</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>æå½é¨é</label>
+            <input type="text" id="st-dept" placeholder="ä»è­·é¨é">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ãã¹ã¯ã¼ã <span class="required">*</span></label>
+          <div class="input-with-btn">
+            <input type="text" id="st-pass" placeholder="ãã¹ã¯ã¼ããè¨­å®">
+            <button type="button" class="btn-gen-pass" onclick="generatePass('st-pass')"><i class="fa fa-random"></i> èªåçæ</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-add-staff')">ã­ã£ã³ã»ã«</button>
+        <button class="btn-primary" onclick="addStaff()"><i class="fa fa-save"></i> ç»é²</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ãã¼ã¹ãéç¥ã¨ãªã¢ -->
+  <div id="toast-container"></div>
 
   <script src="app.js"></script>
 </body>
