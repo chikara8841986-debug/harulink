@@ -159,37 +159,62 @@ textarea { resize: vertical; }
 .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; overflow-x: hidden; }
 .sidebar-nav::-webkit-scrollbar { width: 4px; }
 .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
-
-.nav-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,.3);
-  text-transform: uppercase;
-  padding: 16px 16px 4px;
+.sidgray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 64px;
+  --topbar-height: 60px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+  --transition: .18s ease;
 }
-.nav-item {
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', Meiryo, sans-serif; background: var(--gray-100); color: var(--gray-800); line-height: 1.6; }
+a { text-decoration: none; color: inherit; cursor: pointer; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+input, select, textarea { font-family: inherit; font-size: 14px; }
+textarea { resize: vertical; }
+
+/* ============================================================
+   ログイン画面（共通）
+   ============================================================ */
+.login-screen {
+  min-height: 100vh;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  color: rgba(255,255,255,.65);
-  font-size: 13.5px;
-  font-weight: 500;
-  transition: background var(--transition), color var(--transition);
-  cursor: pointer;
-  position: relative;
-  border-radius: 0;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563EB 50%, #3B82F6 100%);
+  padding: 24px;
 }
-.nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }
-.nav-item.active { background: rgba(37,99,235,.3); color: #fff; }
-.nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--primary); border-radius: 0 2px 2px 0; }
-.nav-item i { width: 18px; text-align: center; flex-shrink: 0; font-size: 15px; }
-.nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+.login-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.login-logo .logo-icon { font-size: 48px; }
+.login-logo h1 { font-size: 28px; font-weight: 700; color: var(--gray-900); margin-top: 8px; }
+.login-logo p { color: var(--gray-500); margin-top: 4px; font-size: 13px; }
 
-.sidebar-footer { padding: 12px 8px; border-top: 1px solid rgba(255,255,255,.08); }
-.btn-logout { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 10px; border-radius: var(--radius); color: rgba(255,255,255,.5); font-size: 13px; transition: background var(--transition), color var(--transition); }
+.login-form .form-group { margin-bottom: 20px; }
+.login-form label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+.input-icon-wrap { position: relative; }
+.input-icon-wrap > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gray-400); pointer-events: none; }
+.input-icon-wrap input { width: 100%; padding: 11px 40px 11px 44px; border: 1.5px solid var(--gray-300); border-radius: var(--radius); font-size: 14px; border-radius: var(--transition), color var(--transition); }
 .btn-logout:hover { background: rgba(239,68,68,.15); color: #FCA5A5; }
 .btn-logout i { width: 18px; text-align: center; }
 
