@@ -7,11 +7,12 @@ var currentCM = null;
 var cmMessages = [];
 
 function callAPI(action, params) {
-  return fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: action, params: params || {} })
-  })
+  var qs = 'action=' + encodeURIComponent(action);
+  var p = params || {};
+  Object.keys(p).forEach(function(k) {
+    qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
+  });
+  return fetch(GAS_URL + '?' + qs)
   .then(function(res) { return res.json(); })
   .then(function(data) {
     if (data.error) throw new Error(data.error);
