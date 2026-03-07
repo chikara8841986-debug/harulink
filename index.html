@@ -3,53 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HaruLink - æ½è¨­ç®¡çã·ã¹ãã </title>
+  <title>HaruLink - 施設管理システム</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="staff-body">
 
-  <!-- ã­ã°ã¤ã³ç»é¢ -->
+  <!-- ログイン画面 -->
   <div id="login-screen" class="login-screen">
     <div class="login-card">
       <div class="login-logo">
-        <span class="logo-icon">ð¸</span>
+        <span class="logo-icon">🌸</span>
         <h1>HaruLink</h1>
-        <p>æ½è¨­ã¹ã¿ããå°ç¨ã­ã°ã¤ã³</p>
+        <p>施設スタッフ専用ログイン</p>
       </div>
       <form id="login-form" class="login-form">
         <div class="form-group">
-          <label>ã¹ã¿ããID</label>
+          <label>スタッフID</label>
           <div class="input-icon-wrap">
             <i class="fa fa-user"></i>
-            <input type="text" id="login-id" placeholder="ã¹ã¿ããIDãå¥å" required>
+            <input type="text" id="login-id" placeholder="スタッフIDを入力" required>
           </div>
         </div>
         <div class="form-group">
-          <label>ãã¹ã¯ã¼ã</label>
+          <label>パスワード</label>
           <div class="input-icon-wrap">
             <i class="fa fa-lock"></i>
-            <input type="password" id="login-pass" placeholder="ãã¹ã¯ã¼ããå¥å" required>
+            <input type="password" id="login-pass" placeholder="パスワードを入力" required>
             <button type="button" class="toggle-pass" onclick="togglePass('login-pass')"><i class="fa fa-eye"></i></button>
           </div>
         </div>
-        <div id="login-error" class="login-error" style="display:none">IDã¾ãã¯ãã¹ã¯ã¼ããæ­£ããããã¾ãã</div>
-        <button type="submit" class="btn-login">ã­ã°ã¤ã³ <i class="fa fa-arrow-right"></i></button>
+        <div id="login-error" class="login-error" style="display:none">IDまたはパスワードが正しくありません</div>
+        <button type="submit" class="btn-login">ログイン <i class="fa fa-arrow-right"></i></button>
       </form>
       <div class="login-links">
-        <a href="family.html">å®¶æã®æ¹ã¯ãã¡ã</a>
-        <a href="caremanager.html">ã±ã¢ããã®æ¹ã¯ãã¡ã</a>
+        <a href="family.html">家族の方はこちら</a>
+        <a href="caremanager.html">ケアマネの方はこちら</a>
       </div>
     </div>
   </div>
 
-  <!-- ã¡ã¤ã³ã¢ããª -->
+  <!-- メインアプリ -->
   <div id="app" class="app" style="display:none">
 
-    <!-- ãµã¤ããã¼ -->
+    <!-- サイドバー -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <span class="logo-icon">ð¸</span>
+        <span class="logo-icon">🌸</span>
         <span class="logo-text">HaruLink</span>
         <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()"><i class="fa fa-chevron-left"></i></button>
       </div>
@@ -57,85 +57,85 @@
       <div class="staff-info-bar">
         <div class="staff-avatar" id="staff-avatar">S</div>
         <div class="staff-detail">
-          <div class="staff-name" id="staff-name-display">ã¹ã¿ããå</div>
-          <div class="staff-role-badge" id="staff-role-badge">ä¸è¬è·å¡</div>
+          <div class="staff-name" id="staff-name-display">スタッフ名</div>
+          <div class="staff-role-badge" id="staff-role-badge">一般職員</div>
         </div>
       </div>
 
       <nav class="sidebar-nav">
-        <div class="nav-section-label">ã¡ã¤ã³</div>
+        <div class="nav-section-label">メイン</div>
         <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
-          <i class="fa fa-home"></i><span>ããã·ã¥ãã¼ã</span>
+          <i class="fa fa-home"></i><span>ダッシュボード</span>
         </a>
         <a class="nav-item" data-page="messages" onclick="showPage('messages', this)">
-          <i class="fa fa-comment-dots"></i><span>ã¡ãã»ã¼ã¸</span>
+          <i class="fa fa-comment-dots"></i><span>メッセージ</span>
           <span class="nav-badge" id="badge-messages" style="display:none">0</span>
         </a>
         <a class="nav-item" data-page="visits" onclick="showPage('visits', this)">
-          <i class="fa fa-calendar-check"></i><span>é¢ä¼äºç´</span>
+          <i class="fa fa-calendar-check"></i><span>面会予約</span>
           <span class="nav-badge" id="badge-visits" style="display:none">0</span>
         </a>
         <a class="nav-item" data-page="caremanager-msg" onclick="showPage('caremanager-msg', this)">
-          <i class="fa fa-briefcase-medical"></i><span>ã±ã¢ããé£çµ¡</span>
+          <i class="fa fa-briefcase-medical"></i><span>ケアマネ連絡</span>
         </a>
 
-        <div class="nav-section-label nav-admin-only">æ½è¨­ç®¡ç</div>
+        <div class="nav-section-label nav-admin-only">施設管理</div>
         <a class="nav-item nav-admin-only" data-page="broadcast" onclick="showPage('broadcast', this)">
-          <i class="fa fa-bullhorn"></i><span>ä¸æéç¥</span>
+          <i class="fa fa-bullhorn"></i><span>一斉通知</span>
         </a>
         <a class="nav-item nav-admin-only" data-page="suspend" onclick="showPage('suspend', this)">
-          <i class="fa fa-ban"></i><span>é¢ä¼ä¸­æ­¢è¨­å®</span>
+          <i class="fa fa-ban"></i><span>面会中止設定</span>
         </a>
 
-        <div class="nav-section-label nav-admin-only">ãã¹ã¿ç®¡ç</div>
+        <div class="nav-section-label nav-admin-only">マスタ管理</div>
         <a class="nav-item nav-admin-only" data-page="residents" onclick="showPage('residents', this)">
-          <i class="fa fa-users"></i><span>å©ç¨èç®¡ç</span>
+          <i class="fa fa-users"></i><span>利用者管理</span>
         </a>
         <a class="nav-item nav-admin-only" data-page="families" onclick="showPage('families', this)">
-          <i class="fa fa-heart"></i><span>å®¶æç®¡ç</span>
+          <i class="fa fa-heart"></i><span>家族管理</span>
         </a>
         <a class="nav-item nav-admin-only" data-page="caremanagers" onclick="showPage('caremanagers', this)">
-          <i class="fa fa-id-card"></i><span>ã±ã¢ããç®¡ç</span>
+          <i class="fa fa-id-card"></i><span>ケアマネ管理</span>
         </a>
         <a class="nav-item nav-admin-only" data-page="staff" onclick="showPage('staff', this)">
-          <i class="fa fa-user-nurse"></i><span>ã¹ã¿ããç®¡ç</span>
+          <i class="fa fa-user-nurse"></i><span>スタッフ管理</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
         <button class="btn-logout" onclick="logout()">
-          <i class="fa fa-sign-out-alt"></i><span>ã­ã°ã¢ã¦ã</span>
+          <i class="fa fa-sign-out-alt"></i><span>ログアウト</span>
         </button>
       </div>
     </aside>
 
-    <!-- ã¡ã¤ã³ã³ã³ãã³ã -->
+    <!-- メインコンテンツ -->
     <main class="main-content" id="main-content">
 
-      <!-- ããããã¼ -->
+      <!-- トップバー -->
       <header class="topbar">
         <div class="topbar-left">
           <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
           <div class="breadcrumb">
             <span class="breadcrumb-app">HaruLink</span>
             <i class="fa fa-chevron-right"></i>
-            <span class="page-title" id="page-title">ããã·ã¥ãã¼ã</span>
+            <span class="page-title" id="page-title">ダッシュボード</span>
           </div>
         </div>
         <div class="topbar-right">
           <div class="topbar-date" id="topbar-date"></div>
-          <button class="topbar-icon-btn" onclick="loadAll()" title="ãã¼ã¿æ´æ°">
+          <button class="topbar-icon-btn" onclick="loadAll()" title="データ更新">
             <i class="fa fa-sync-alt"></i>
           </button>
         </div>
       </header>
 
-      <!-- ã­ã¼ãã£ã³ã° -->
+      <!-- ローディング -->
       <div class="loading-overlay" id="loading-overlay" style="display:none">
         <div class="spinner"></div>
       </div>
 
-      <!-- ========== ããã·ã¥ãã¼ã ========== -->
+      <!-- ========== ダッシュボード ========== -->
       <div class="page active" id="page-dashboard">
         <div class="dashboard-greeting" id="dashboard-greeting"></div>
 
@@ -143,32 +143,32 @@
           <div class="kpi-card" style="--kpi-color:#3B82F6">
             <div class="kpi-icon"><i class="fa fa-comment-dots"></i></div>
             <div class="kpi-body">
-              <div class="kpi-value" id="kpi-unread">â</div>
-              <div class="kpi-label">æªèª­ã¡ãã»ã¼ã¸</div>
+              <div class="kpi-value" id="kpi-unread">—</div>
+              <div class="kpi-label">未読メッセージ</div>
             </div>
             <div class="kpi-arrow" onclick="showPage('messages',null)"><i class="fa fa-chevron-right"></i></div>
           </div>
           <div class="kpi-card" style="--kpi-color:#F59E0B">
             <div class="kpi-icon"><i class="fa fa-calendar-check"></i></div>
             <div class="kpi-body">
-              <div class="kpi-value" id="kpi-pending-visits">â</div>
-              <div class="kpi-label">é¢ä¼ç³è«ä¸­</div>
+              <div class="kpi-value" id="kpi-pending-visits">—</div>
+              <div class="kpi-label">面会申請中</div>
             </div>
             <div class="kpi-arrow" onclick="showPage('visits',null)"><i class="fa fa-chevron-right"></i></div>
           </div>
           <div class="kpi-card" style="--kpi-color:#10B981">
             <div class="kpi-icon"><i class="fa fa-users"></i></div>
             <div class="kpi-body">
-              <div class="kpi-value" id="kpi-residents">â</div>
-              <div class="kpi-label">ç»é²å©ç¨èæ°</div>
+              <div class="kpi-value" id="kpi-residents">—</div>
+              <div class="kpi-label">登録利用者数</div>
             </div>
             <div class="kpi-arrow" onclick="showPage('residents',null)"><i class="fa fa-chevron-right"></i></div>
           </div>
           <div class="kpi-card" style="--kpi-color:#8B5CF6">
             <div class="kpi-icon"><i class="fa fa-calendar-day"></i></div>
             <div class="kpi-body">
-              <div class="kpi-value" id="kpi-today-visits">â</div>
-              <div class="kpi-label">æ¬æ¥ã®é¢ä¼</div>
+              <div class="kpi-value" id="kpi-today-visits">—</div>
+              <div class="kpi-label">本日の面会</div>
             </div>
             <div class="kpi-arrow" onclick="showPage('visits',null)"><i class="fa fa-chevron-right"></i></div>
           </div>
@@ -177,259 +177,259 @@
         <div class="dashboard-panels">
           <div class="panel">
             <div class="panel-header">
-              <span><i class="fa fa-comment-dots"></i> ææ°ã¡ãã»ã¼ã¸</span>
-              <button class="btn-link" onclick="showPage('messages',null)">ãã¹ã¦è¦ã <i class="fa fa-arrow-right"></i></button>
+              <span><i class="fa fa-comment-dots"></i> 最新メッセージ</span>
+              <button class="btn-link" onclick="showPage('messages',null)">すべて見る <i class="fa fa-arrow-right"></i></button>
             </div>
             <div class="panel-body" id="dashboard-messages">
-              <div class="empty-state"><i class="fa fa-inbox"></i><p>ã¡ãã»ã¼ã¸ã¯ããã¾ãã</p></div>
+              <div class="empty-state"><i class="fa fa-inbox"></i><p>メッセージはありません</p></div>
             </div>
           </div>
           <div class="panel">
             <div class="panel-header">
-              <span><i class="fa fa-calendar-check"></i> ç³è«ä¸­ã®é¢ä¼äºç´</span>
-              <button class="btn-link" onclick="showPage('visits',null)">ãã¹ã¦è¦ã <i class="fa fa-arrow-right"></i></button>
+              <span><i class="fa fa-calendar-check"></i> 申請中の面会予約</span>
+              <button class="btn-link" onclick="showPage('visits',null)">すべて見る <i class="fa fa-arrow-right"></i></button>
             </div>
             <div class="panel-body" id="dashboard-visits">
-              <div class="empty-state"><i class="fa fa-calendar"></i><p>ç³è«ä¸­ã®äºç´ã¯ããã¾ãã</p></div>
+              <div class="empty-state"><i class="fa fa-calendar"></i><p>申請中の予約はありません</p></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ========== ã¡ãã»ã¼ã¸ ========== -->
+      <!-- ========== メッセージ ========== -->
       <div class="page" id="page-messages">
         <div class="page-header">
-          <h2><i class="fa fa-comment-dots"></i> ã¡ãã»ã¼ã¸</h2>
+          <h2><i class="fa fa-comment-dots"></i> メッセージ</h2>
           <button class="btn-primary" onclick="openModal('modal-send-message')">
-            <i class="fa fa-plus"></i> æ°è¦ã¡ãã»ã¼ã¸
+            <i class="fa fa-plus"></i> 新規メッセージ
           </button>
         </div>
         <div class="filter-bar">
           <div class="search-wrap">
             <i class="fa fa-search"></i>
-            <input type="text" class="search-input" id="msg-search" placeholder="éä¿¡èã»åä¿¡èã»åå®¹ã§æ¤ç´¢..." oninput="filterMessages()">
+            <input type="text" class="search-input" id="msg-search" placeholder="送信者・受信者・内容で検索..." oninput="filterMessages()">
           </div>
           <select class="filter-select" id="msg-filter" onchange="filterMessages()">
-            <option value="">ãã¹ã¦</option>
-            <option value="æªèª­">æªèª­ã®ã¿</option>
+            <option value="">すべて</option>
+            <option value="未読">未読のみ</option>
           </select>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:60px">ç¶æ</th>
-                <th>éä¿¡è</th>
-                <th>åä¿¡è</th>
-                <th>åå®¹</th>
-                <th style="width:150px">éä¿¡æ¥æ</th>
+                <th style="width:60px">状態</th>
+                <th>送信者</th>
+                <th>受信者</th>
+                <th>内容</th>
+                <th style="width:150px">送信日時</th>
               </tr>
             </thead>
             <tbody id="messages-tbody">
-              <tr><td colspan="5" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="5" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== é¢ä¼äºç´ ========== -->
+      <!-- ========== 面会予約 ========== -->
       <div class="page" id="page-visits">
         <div class="page-header">
-          <h2><i class="fa fa-calendar-check"></i> é¢ä¼äºç´ç®¡ç</h2>
+          <h2><i class="fa fa-calendar-check"></i> 面会予約管理</h2>
         </div>
         <div class="filter-bar">
           <div class="search-wrap">
             <i class="fa fa-search"></i>
-            <input type="text" class="search-input" id="visit-search" placeholder="ç³è«èã»å©ç¨èåã§æ¤ç´¢..." oninput="filterVisits()">
+            <input type="text" class="search-input" id="visit-search" placeholder="申請者・利用者名で検索..." oninput="filterVisits()">
           </div>
           <select class="filter-select" id="visit-filter" onchange="filterVisits()">
-            <option value="">ãã¹ã¦</option>
-            <option value="ç³è«ä¸­">ç³è«ä¸­</option>
-            <option value="æ¿èª">æ¿èªæ¸</option>
-            <option value="å´ä¸">å´ä¸</option>
+            <option value="">すべて</option>
+            <option value="申請中">申請中</option>
+            <option value="承認">承認済</option>
+            <option value="却下">却下</option>
           </select>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:90px">ã¹ãã¼ã¿ã¹</th>
-                <th>ç³è«è</th>
-                <th>å©ç¨èå</th>
-                <th>å¸ææ¥</th>
-                <th>å¸ææé</th>
-                <th style="width:40px">äººæ°</th>
-                <th>ç®ç</th>
-                <th style="width:150px">ç³è«æ¥æ</th>
-                <th style="width:140px">æä½</th>
+                <th style="width:90px">ステータス</th>
+                <th>申請者</th>
+                <th>利用者名</th>
+                <th>希望日</th>
+                <th>希望時間</th>
+                <th style="width:40px">人数</th>
+                <th>目的</th>
+                <th style="width:150px">申請日時</th>
+                <th style="width:140px">操作</th>
               </tr>
             </thead>
             <tbody id="visits-tbody">
-              <tr><td colspan="9" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="9" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== ã±ã¢ããé£çµ¡ ========== -->
+      <!-- ========== ケアマネ連絡 ========== -->
       <div class="page" id="page-caremanager-msg">
         <div class="page-header">
-          <h2><i class="fa fa-briefcase-medical"></i> ã±ã¢ããé£çµ¡</h2>
+          <h2><i class="fa fa-briefcase-medical"></i> ケアマネ連絡</h2>
           <button class="btn-primary" onclick="openModal('modal-caremanager-msg')">
-            <i class="fa fa-plus"></i> æ°è¦é£çµ¡
+            <i class="fa fa-plus"></i> 新規連絡
           </button>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
               <tr>
-                <th style="width:60px">ç¶æ</th>
-                <th>ã±ã¢ããå</th>
-                <th>ä»¶å</th>
-                <th>åå®¹</th>
-                <th style="width:150px">éä¿¡æ¥æ</th>
+                <th style="width:60px">状態</th>
+                <th>ケアマネ名</th>
+                <th>件名</th>
+                <th>内容</th>
+                <th style="width:150px">送信日時</th>
               </tr>
             </thead>
             <tbody id="caremanager-msg-tbody">
-              <tr><td colspan="5" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="5" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== ä¸æéç¥ï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <!-- ========== 一斉通知（管理者のみ） ========== -->
       <div class="page" id="page-broadcast">
         <div class="page-header">
-          <h2><i class="fa fa-bullhorn"></i> ä¸æéç¥</h2>
+          <h2><i class="fa fa-bullhorn"></i> 一斉通知</h2>
           <button class="btn-primary" onclick="openModal('modal-broadcast')">
-            <i class="fa fa-plus"></i> æ°è¦éç¥ä½æ
+            <i class="fa fa-plus"></i> 新規通知作成
           </button>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>ã¿ã¤ãã«</th><th>å¯¾è±¡</th><th style="width:150px">éä¿¡æ¥æ</th><th>æ¬æ</th></tr>
+              <tr><th>タイトル</th><th>対象</th><th style="width:150px">送信日時</th><th>本文</th></tr>
             </thead>
             <tbody id="broadcast-tbody">
-              <tr><td colspan="4" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="4" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== é¢ä¼ä¸­æ­¢è¨­å®ï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <!-- ========== 面会中止設定（管理者のみ） ========== -->
       <div class="page" id="page-suspend">
         <div class="page-header">
-          <h2><i class="fa fa-ban"></i> é¢ä¼ä¸­æ­¢è¨­å®</h2>
+          <h2><i class="fa fa-ban"></i> 面会中止設定</h2>
           <button class="btn-primary" onclick="openModal('modal-suspend')">
-            <i class="fa fa-plus"></i> æ°è¦è¨­å®
+            <i class="fa fa-plus"></i> 新規設定
           </button>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>éå§æ¥</th><th>çµäºæ¥</th><th>çç±</th><th style="width:150px">è¨­å®æ¥æ</th></tr>
+              <tr><th>開始日</th><th>終了日</th><th>理由</th><th style="width:150px">設定日時</th></tr>
             </thead>
             <tbody id="suspend-tbody">
-              <tr><td colspan="4" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="4" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== å©ç¨èç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <!-- ========== 利用者管理（管理者のみ） ========== -->
       <div class="page" id="page-residents">
         <div class="page-header">
-          <h2><i class="fa fa-users"></i> å©ç¨èç®¡ç</h2>
+          <h2><i class="fa fa-users"></i> 利用者管理</h2>
           <button class="btn-primary" onclick="openModal('modal-add-resident')">
-            <i class="fa fa-plus"></i> å©ç¨èç»é²
+            <i class="fa fa-plus"></i> 利用者登録
           </button>
         </div>
         <div class="filter-bar">
           <div class="search-wrap">
             <i class="fa fa-search"></i>
-            <input type="text" class="search-input" id="resident-search" placeholder="æ°åã»é¨å±çªå·ã§æ¤ç´¢..." oninput="filterResidents()">
+            <input type="text" class="search-input" id="resident-search" placeholder="氏名・部屋番号で検索..." oninput="filterResidents()">
           </div>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>å©ç¨èID</th><th>æ°å</th><th>é¨å±çªå·</th><th>å¥å±æ¥</th><th>æå½ã¹ã¿ãã</th><th style="width:100px">æä½</th></tr>
+              <tr><th>利用者ID</th><th>氏名</th><th>部屋番号</th><th>入居日</th><th>担当スタッフ</th><th style="width:100px">操作</th></tr>
             </thead>
             <tbody id="residents-tbody">
-              <tr><td colspan="6" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="6" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== å®¶æç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <!-- ========== 家族管理（管理者のみ） ========== -->
       <div class="page" id="page-families">
         <div class="page-header">
-          <h2><i class="fa fa-heart"></i> å®¶æç®¡ç</h2>
+          <h2><i class="fa fa-heart"></i> 家族管理</h2>
           <button class="btn-primary" onclick="openModal('modal-add-family')">
-            <i class="fa fa-plus"></i> å®¶æç»é²
+            <i class="fa fa-plus"></i> 家族登録
           </button>
         </div>
         <div class="filter-bar">
           <div class="search-wrap">
             <i class="fa fa-search"></i>
-            <input type="text" class="search-input" id="family-search" placeholder="æ°åã»å©ç¨èåã§æ¤ç´¢..." oninput="filterFamilies()">
+            <input type="text" class="search-input" id="family-search" placeholder="氏名・利用者名で検索..." oninput="filterFamilies()">
           </div>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>å®¶æID</th><th>æ°å</th><th>ç¶æ</th><th>å©ç¨èå</th><th>ã¡ã¼ã«</th><th>ãã¹ã¯ã¼ã</th><th style="width:100px">æä½</th></tr>
+              <tr><th>家族ID</th><th>氏名</th><th>続柄</th><th>利用者名</th><th>メール</th><th>パスワード</th><th style="width:100px">操作</th></tr>
             </thead>
             <tbody id="families-tbody">
-              <tr><td colspan="7" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="7" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== ã±ã¢ããç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <!-- ========== ケアマネ管理（管理者のみ） ========== -->
       <div class="page" id="page-caremanagers">
         <div class="page-header">
-          <h2><i class="fa fa-id-card"></i> ã±ã¢ããç®¡ç</h2>
+          <h2><i class="fa fa-id-card"></i> ケアマネ管理</h2>
           <button class="btn-primary" onclick="openModal('modal-add-caremanager')">
-            <i class="fa fa-plus"></i> ã±ã¢ããç»é²
+            <i class="fa fa-plus"></i> ケアマネ登録
           </button>
         </div>
         <div class="filter-bar">
           <div class="search-wrap">
             <i class="fa fa-search"></i>
-            <input type="text" class="search-input" id="cm-search" placeholder="æ°åã»æå±ã§æ¤ç´¢..." oninput="filterCareManagers()">
+            <input type="text" class="search-input" id="cm-search" placeholder="氏名・所属で検索..." oninput="filterCareManagers()">
           </div>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>ã±ã¢ããID</th><th>æ°å</th><th>æå±</th><th>ã¡ã¼ã«</th><th>ãã¹ã¯ã¼ã</th><th style="width:100px">æä½</th></tr>
+              <tr><th>ケアマネID</th><th>氏名</th><th>所属</th><th>メール</th><th>パスワード</th><th style="width:100px">操作</th></tr>
             </thead>
             <tbody id="caremanagers-tbody">
-              <tr><td colspan="6" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="6" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== ã¹ã¿ããç®¡çï¼ç®¡çèã®ã¿ï¼ ========== -->
+      <!-- ========== スタッフ管理（管理者のみ） ========== -->
       <div class="page" id="page-staff">
         <div class="page-header">
-          <h2><i class="fa fa-user-nurse"></i> ã¹ã¿ããç®¡ç</h2>
+          <h2><i class="fa fa-user-nurse"></i> スタッフ管理</h2>
           <button class="btn-primary" onclick="openModal('modal-add-staff')">
-            <i class="fa fa-plus"></i> ã¹ã¿ããç»é²
+            <i class="fa fa-plus"></i> スタッフ登録
           </button>
         </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>ã¹ã¿ããID</th><th>æ°å</th><th>æ¨©é</th><th>æå½é¨é</th><th style="width:100px">æä½</th></tr>
+              <tr><th>スタッフID</th><th>氏名</th><th>権限</th><th>担当部門</th><th style="width:100px">操作</th></tr>
             </thead>
             <tbody id="staff-tbody">
-              <tr><td colspan="5" class="table-empty">èª­ã¿è¾¼ã¿ä¸­...</td></tr>
+              <tr><td colspan="5" class="table-empty">読み込み中...</td></tr>
             </tbody>
           </table>
         </div>
@@ -438,300 +438,300 @@
     </main>
   </div>
 
-  <!-- ========== ã¢ã¼ãã«ç¾¤ ========== -->
+  <!-- ========== モーダル群 ========== -->
 
-  <!-- ã¡ãã»ã¼ã¸éä¿¡ -->
+  <!-- メッセージ送信 -->
   <div class="modal-overlay" id="modal-send-message">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa fa-comment-dots"></i> æ°è¦ã¡ãã»ã¼ã¸</h3>
+        <h3><i class="fa fa-comment-dots"></i> 新規メッセージ</h3>
         <button class="modal-close" onclick="closeModal('modal-send-message')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>åä¿¡è <span class="required">*</span></label>
-          <input type="text" id="msg-receiver" placeholder="åä¿¡èåãå¥å">
+          <label>受信者 <span class="required">*</span></label>
+          <input type="text" id="msg-receiver" placeholder="受信者名を入力">
         </div>
         <div class="form-group">
-          <label>ã¡ãã»ã¼ã¸åå®¹ <span class="required">*</span></label>
-          <textarea id="msg-body" rows="5" placeholder="ã¡ãã»ã¼ã¸ãå¥åãã¦ãã ãã"></textarea>
+          <label>メッセージ内容 <span class="required">*</span></label>
+          <textarea id="msg-body" rows="5" placeholder="メッセージを入力してください"></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-send-message')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="sendMessage()"><i class="fa fa-paper-plane"></i> éä¿¡</button>
+        <button class="btn-secondary" onclick="closeModal('modal-send-message')">キャンセル</button>
+        <button class="btn-primary" onclick="sendMessage()"><i class="fa fa-paper-plane"></i> 送信</button>
       </div>
     </div>
   </div>
 
-  <!-- ä¸æéç¥ -->
+  <!-- 一斉通知 -->
   <div class="modal-overlay" id="modal-broadcast">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa fa-bullhorn"></i> ä¸æéç¥ä½æ</h3>
+        <h3><i class="fa fa-bullhorn"></i> 一斉通知作成</h3>
         <button class="modal-close" onclick="closeModal('modal-broadcast')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>ã¿ã¤ãã« <span class="required">*</span></label>
-          <input type="text" id="bc-title" placeholder="éç¥ã¿ã¤ãã«ãå¥å">
+          <label>タイトル <span class="required">*</span></label>
+          <input type="text" id="bc-title" placeholder="通知タイトルを入力">
         </div>
         <div class="form-group">
-          <label>å¯¾è±¡</label>
+          <label>対象</label>
           <select id="bc-target">
-            <option value="å¨å¡">å¨å¡</option>
-            <option value="å®¶æ">å®¶æã®ã¿</option>
-            <option value="ã±ã¢ãã">ã±ã¢ããã®ã¿</option>
+            <option value="全員">全員</option>
+            <option value="家族">家族のみ</option>
+            <option value="ケアマネ">ケアマネのみ</option>
           </select>
         </div>
         <div class="form-group">
-          <label>æ¬æ <span class="required">*</span></label>
-          <textarea id="bc-body" rows="5" placeholder="éç¥åå®¹ãå¥åãã¦ãã ãã"></textarea>
+          <label>本文 <span class="required">*</span></label>
+          <textarea id="bc-body" rows="5" placeholder="通知内容を入力してください"></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-broadcast')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="sendBroadcast()"><i class="fa fa-bullhorn"></i> éä¿¡</button>
+        <button class="btn-secondary" onclick="closeModal('modal-broadcast')">キャンセル</button>
+        <button class="btn-primary" onclick="sendBroadcast()"><i class="fa fa-bullhorn"></i> 送信</button>
       </div>
     </div>
   </div>
 
-  <!-- é¢ä¼ä¸­æ­¢è¨­å® -->
+  <!-- 面会中止設定 -->
   <div class="modal-overlay" id="modal-suspend">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa fa-ban"></i> é¢ä¼ä¸­æ­¢è¨­å®</h3>
+        <h3><i class="fa fa-ban"></i> 面会中止設定</h3>
         <button class="modal-close" onclick="closeModal('modal-suspend')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label>éå§æ¥ <span class="required">*</span></label>
+            <label>開始日 <span class="required">*</span></label>
             <input type="date" id="suspend-start">
           </div>
           <div class="form-group">
-            <label>çµäºæ¥ <span class="required">*</span></label>
+            <label>終了日 <span class="required">*</span></label>
             <input type="date" id="suspend-end">
           </div>
         </div>
         <div class="form-group">
-          <label>çç±</label>
-          <textarea id="suspend-reason" rows="3" placeholder="é¢ä¼ä¸­æ­¢ã®çç±ãå¥åãã¦ãã ãã"></textarea>
+          <label>理由</label>
+          <textarea id="suspend-reason" rows="3" placeholder="面会中止の理由を入力してください"></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-suspend')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-danger" onclick="setSuspend()"><i class="fa fa-ban"></i> è¨­å®ãã</button>
+        <button class="btn-secondary" onclick="closeModal('modal-suspend')">キャンセル</button>
+        <button class="btn-danger" onclick="setSuspend()"><i class="fa fa-ban"></i> 設定する</button>
       </div>
     </div>
   </div>
 
-  <!-- ã±ã¢ããé£çµ¡ -->
+  <!-- ケアマネ連絡 -->
   <div class="modal-overlay" id="modal-caremanager-msg">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa fa-briefcase-medical"></i> ã±ã¢ããã¸ã®é£çµ¡</h3>
+        <h3><i class="fa fa-briefcase-medical"></i> ケアマネへの連絡</h3>
         <button class="modal-close" onclick="closeModal('modal-caremanager-msg')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>éä¿¡åã±ã¢ãã <span class="required">*</span></label>
+          <label>送信先ケアマネ <span class="required">*</span></label>
           <select id="cm-msg-target">
-            <option value="">é¸æãã¦ãã ãã</option>
+            <option value="">選択してください</option>
           </select>
         </div>
         <div class="form-group">
-          <label>ä»¶å <span class="required">*</span></label>
-          <input type="text" id="cm-msg-subject" placeholder="ä»¶åãå¥å">
+          <label>件名 <span class="required">*</span></label>
+          <input type="text" id="cm-msg-subject" placeholder="件名を入力">
         </div>
         <div class="form-group">
-          <label>æ¬æ <span class="required">*</span></label>
-          <textarea id="cm-msg-body" rows="5" placeholder="é£çµ¡åå®¹ãå¥åãã¦ãã ãã"></textarea>
+          <label>本文 <span class="required">*</span></label>
+          <textarea id="cm-msg-body" rows="5" placeholder="連絡内容を入力してください"></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-caremanager-msg')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="sendCareManagerMsg()"><i class="fa fa-paper-plane"></i> éä¿¡</button>
+        <button class="btn-secondary" onclick="closeModal('modal-caremanager-msg')">キャンセル</button>
+        <button class="btn-primary" onclick="sendCareManagerMsg()"><i class="fa fa-paper-plane"></i> 送信</button>
       </div>
     </div>
   </div>
 
-  <!-- å©ç¨èç»é² -->
+  <!-- 利用者登録 -->
   <div class="modal-overlay" id="modal-add-resident">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa fa-users"></i> å©ç¨èç»é²</h3>
+        <h3><i class="fa fa-users"></i> 利用者登録</h3>
         <button class="modal-close" onclick="closeModal('modal-add-resident')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label>æ°å <span class="required">*</span></label>
-            <input type="text" id="res-name" placeholder="å±±ç° å¤ªé">
+            <label>氏名 <span class="required">*</span></label>
+            <input type="text" id="res-name" placeholder="山田 太郎">
           </div>
           <div class="form-group">
-            <label>é¨å±çªå· <span class="required">*</span></label>
+            <label>部屋番号 <span class="required">*</span></label>
             <input type="text" id="res-room" placeholder="101">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>å¥å±æ¥</label>
+            <label>入居日</label>
             <input type="date" id="res-date">
           </div>
           <div class="form-group">
-            <label>æå½ã¹ã¿ãã</label>
+            <label>担当スタッフ</label>
             <select id="res-staff">
-              <option value="">é¸æãã¦ãã ãã</option>
+              <option value="">選択してください</option>
             </select>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-add-resident')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="addResident()"><i class="fa fa-save"></i> ç»é²</button>
+        <button class="btn-secondary" onclick="closeModal('modal-add-resident')">キャンセル</button>
+        <button class="btn-primary" onclick="addResident()"><i class="fa fa-save"></i> 登録</button>
       </div>
     </div>
   </div>
 
-  <!-- å®¶æç»é² -->
+  <!-- 家族登録 -->
   <div class="modal-overlay" id="modal-add-family">
     <div class="modal modal-wide">
       <div class="modal-header">
-        <h3><i class="fa fa-heart"></i> å®¶æç»é²</h3>
+        <h3><i class="fa fa-heart"></i> 家族登録</h3>
         <button class="modal-close" onclick="closeModal('modal-add-family')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label>æ°å <span class="required">*</span></label>
-            <input type="text" id="fam-name" placeholder="å±±ç° è±å­">
+            <label>氏名 <span class="required">*</span></label>
+            <input type="text" id="fam-name" placeholder="山田 花子">
           </div>
           <div class="form-group">
-            <label>ç¶æ <span class="required">*</span></label>
+            <label>続柄 <span class="required">*</span></label>
             <select id="fam-relation">
-              <option value="é·ç·">é·ç·</option>
-              <option value="é·å¥³">é·å¥³</option>
-              <option value="æ¬¡ç·">æ¬¡ç·</option>
-              <option value="æ¬¡å¥³">æ¬¡å¥³</option>
-              <option value="éå¶è">éå¶è</option>
-              <option value="ãã®ä»">ãã®ä»</option>
+              <option value="長男">長男</option>
+              <option value="長女">長女</option>
+              <option value="次男">次男</option>
+              <option value="次女">次女</option>
+              <option value="配偶者">配偶者</option>
+              <option value="その他">その他</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label>å¯¾è±¡å©ç¨è <span class="required">*</span></label>
+          <label>対象利用者 <span class="required">*</span></label>
           <select id="fam-resident">
-            <option value="">é¸æãã¦ãã ãã</option>
+            <option value="">選択してください</option>
           </select>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>ãã¹ã¯ã¼ã <span class="required">*</span></label>
+            <label>パスワード <span class="required">*</span></label>
             <div class="input-with-btn">
-              <input type="text" id="fam-pass" placeholder="ãã¹ã¯ã¼ããè¨­å®">
-              <button type="button" class="btn-gen-pass" onclick="generatePass('fam-pass')"><i class="fa fa-random"></i> èªåçæ</button>
+              <input type="text" id="fam-pass" placeholder="パスワードを設定">
+              <button type="button" class="btn-gen-pass" onclick="generatePass('fam-pass')"><i class="fa fa-random"></i> 自動生成</button>
             </div>
           </div>
           <div class="form-group">
-            <label>ã¡ã¼ã«ã¢ãã¬ã¹</label>
+            <label>メールアドレス</label>
             <input type="email" id="fam-email" placeholder="example@mail.com">
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-add-family')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="addFamily()"><i class="fa fa-save"></i> ç»é²</button>
+        <button class="btn-secondary" onclick="closeModal('modal-add-family')">キャンセル</button>
+        <button class="btn-primary" onclick="addFamily()"><i class="fa fa-save"></i> 登録</button>
       </div>
     </div>
   </div>
 
-  <!-- ã±ã¢ããç»é² -->
+  <!-- ケアマネ登録 -->
   <div class="modal-overlay" id="modal-add-caremanager">
     <div class="modal modal-wide">
       <div class="modal-header">
-        <h3><i class="fa fa-id-card"></i> ã±ã¢ããç»é²</h3>
+        <h3><i class="fa fa-id-card"></i> ケアマネ登録</h3>
         <button class="modal-close" onclick="closeModal('modal-add-caremanager')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label>æ°å <span class="required">*</span></label>
-            <input type="text" id="cm-name" placeholder="é´æ¨ ä¸é">
+            <label>氏名 <span class="required">*</span></label>
+            <input type="text" id="cm-name" placeholder="鈴木 一郎">
           </div>
           <div class="form-group">
-            <label>æå±äºæ¥­æ <span class="required">*</span></label>
-            <input type="text" id="cm-org" placeholder="ããã±ã¢ãã©ã³ã»ã³ã¿ã¼">
+            <label>所属事業所 <span class="required">*</span></label>
+            <input type="text" id="cm-org" placeholder="〇〇ケアプランセンター">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>ãã¹ã¯ã¼ã <span class="required">*</span></label>
+            <label>パスワード <span class="required">*</span></label>
             <div class="input-with-btn">
-              <input type="text" id="cm-pass" placeholder="ãã¹ã¯ã¼ããè¨­å®">
-              <button type="button" class="btn-gen-pass" onclick="generatePass('cm-pass')"><i class="fa fa-random"></i> èªåçæ</button>
+              <input type="text" id="cm-pass" placeholder="パスワードを設定">
+              <button type="button" class="btn-gen-pass" onclick="generatePass('cm-pass')"><i class="fa fa-random"></i> 自動生成</button>
             </div>
           </div>
           <div class="form-group">
-            <label>ã¡ã¼ã«ã¢ãã¬ã¹</label>
+            <label>メールアドレス</label>
             <input type="email" id="cm-email" placeholder="example@mail.com">
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-add-caremanager')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="addCareManager()"><i class="fa fa-save"></i> ç»é²</button>
+        <button class="btn-secondary" onclick="closeModal('modal-add-caremanager')">キャンセル</button>
+        <button class="btn-primary" onclick="addCareManager()"><i class="fa fa-save"></i> 登録</button>
       </div>
     </div>
   </div>
 
-  <!-- ã¹ã¿ããç»é² -->
+  <!-- スタッフ登録 -->
   <div class="modal-overlay" id="modal-add-staff">
     <div class="modal modal-wide">
       <div class="modal-header">
-        <h3><i class="fa fa-user-nurse"></i> ã¹ã¿ããç»é²</h3>
+        <h3><i class="fa fa-user-nurse"></i> スタッフ登録</h3>
         <button class="modal-close" onclick="closeModal('modal-add-staff')"><i class="fa fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label>ã¹ã¿ããID <span class="required">*</span></label>
+            <label>スタッフID <span class="required">*</span></label>
             <input type="text" id="st-id" placeholder="staff001">
           </div>
           <div class="form-group">
-            <label>æ°å <span class="required">*</span></label>
-            <input type="text" id="st-name" placeholder="ç°ä¸­ æ¬¡é">
+            <label>氏名 <span class="required">*</span></label>
+            <input type="text" id="st-name" placeholder="田中 次郎">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>æ¨©é <span class="required">*</span></label>
+            <label>権限 <span class="required">*</span></label>
             <select id="st-role">
-              <option value="ä¸è¬è·å¡">ä¸è¬è·å¡</option>
-              <option value="ç®¡çè">ç®¡çè</option>
+              <option value="一般職員">一般職員</option>
+              <option value="管理者">管理者</option>
             </select>
           </div>
           <div class="form-group">
-            <label>æå½é¨é</label>
-            <input type="text" id="st-dept" placeholder="ä»è­·é¨é">
+            <label>担当部門</label>
+            <input type="text" id="st-dept" placeholder="介護部門">
           </div>
         </div>
         <div class="form-group">
-          <label>ãã¹ã¯ã¼ã <span class="required">*</span></label>
+          <label>パスワード <span class="required">*</span></label>
           <div class="input-with-btn">
-            <input type="text" id="st-pass" placeholder="ãã¹ã¯ã¼ããè¨­å®">
-            <button type="button" class="btn-gen-pass" onclick="generatePass('st-pass')"><i class="fa fa-random"></i> èªåçæ</button>
+            <input type="text" id="st-pass" placeholder="パスワードを設定">
+            <button type="button" class="btn-gen-pass" onclick="generatePass('st-pass')"><i class="fa fa-random"></i> 自動生成</button>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeModal('modal-add-staff')">ã­ã£ã³ã»ã«</button>
-        <button class="btn-primary" onclick="addStaff()"><i class="fa fa-save"></i> ç»é²</button>
+        <button class="btn-secondary" onclick="closeModal('modal-add-staff')">キャンセル</button>
+        <button class="btn-primary" onclick="addStaff()"><i class="fa fa-save"></i> 登録</button>
       </div>
     </div>
   </div>
 
-  <!-- ãã¼ã¹ãéç¥ã¨ãªã¢ -->
+  <!-- トースト通知エリア -->
   <div id="toast-container"></div>
 
   <script src="app.js"></script>
