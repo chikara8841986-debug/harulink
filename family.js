@@ -11,7 +11,7 @@ function callAPI(action, params) {
   var p = params || {};
   Object.keys(p).forEach(function(k) {
     qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-  });h
+  });
   return fetch(GAS_URL + '?' + qs)
   .then(function(res) { return res.json(); })
   .then(function(data) {
