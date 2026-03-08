@@ -11,7 +11,7 @@ function callAPI(action, params) {
   var p = params || {};
   Object.keys(p).forEach(function(k) {
     qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-  });
+  });h
   return fetch(GAS_URL + '?' + qs)
   .then(function(res) { return res.json(); })
   .then(function(data) {
@@ -122,7 +122,7 @@ function renderFamilyChat() {
 function familySendMessage() {
   var body = document.getElementById('family-msg-input').value.trim();
   if (!body) return;
-  callAPI('sendMessage', {
+  callAPI('postMessage', {
     sender: currentFamily.name,
     receiver: currentFamily.staffName || '担当スタッフ',
     message: body,
