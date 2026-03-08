@@ -45,7 +45,10 @@
       </div>
       <div class="portal-user">
         <div class="avatar" id="family-avatar">家</div>
-        <span id="family-name-display"></span>
+        <div style="display:flex;flex-direction:column;line-height:1.3">
+          <span id="family-name-display" style="font-size:14px;font-weight:600"></span>
+          <span style="font-size:11px;opacity:.75">担当：<span id="staff-name-display"></span></span>
+        </div>
         <button onclick="logout()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;margin-left:12px;cursor:pointer">ログアウト</button>
       </div>
     </header>
