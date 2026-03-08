@@ -62,7 +62,7 @@ function initFamilyApp() {
   document.getElementById('app').style.display = 'block';
   document.getElementById('family-name-display').textContent = currentFamily.name + ' 様';
   document.getElementById('family-avatar').textContent = currentFamily.name ? currentFamily.name[0] : '家';
-
+  document.getElementById('staff-name-display').textContent = currentFamily.staffName || '担当スタッフ';
   // 最低希望日を明日に設定
   var tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
