@@ -11,7 +11,7 @@ function callAPI(action, params) {
   var p = params || {};
   Object.keys(p).forEach(function(k) {
     qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-  });
+  });h
   return fetch(GAS_URL + '?' + qs)
   .then(function(res) { return res.json(); })
   .then(function(data) {
@@ -113,7 +113,7 @@ function renderFamilyChat() {
       '<div class="chat-content">' +
       '<div class="chat-name">' + esc(m['送信者']) + '</div>' +
       '<div class="chat-text">' + esc(m['本文']).replace(/\n/g,'<br>') + '</div>' +
-      '<div class="chat-time">' + esc(String(m['送信日時'])) + '</div>' +
+      '<div class="chat-time">' + esc(String(m['送信日'])) + '</div>' +
       '</div></div>';
   }).join('');
   wrap.scrollTop = wrap.scrollHeight;
@@ -190,4 +190,11 @@ function renderFamilyNotices() {
 function esc(str) {
   if (str === undefined || str === null) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function formatDate(val) {
+  if (!val) return '';
+  var d = new Date(val);
+  if (isNaN(d.getTime())) return String(val);
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
 }
