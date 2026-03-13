@@ -11,7 +11,7 @@ function callAPI(action, params) {
   var p = params || {};
   Object.keys(p).forEach(function(k) {
     qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-  });h
+  });
   return fetch(GAS_URL + '?' + qs)
   .then(function(res) { return res.json(); })
   .then(function(data) {
@@ -62,7 +62,9 @@ function initFamilyApp() {
   document.getElementById('app').style.display = 'block';
   document.getElementById('family-name-display').textContent = currentFamily.name + ' 様';
   document.getElementById('family-avatar').textContent = currentFamily.name ? currentFamily.name[0] : '家';
-  document.getElementById('staff-name-display').textContent = currentFamily.staffName || '担当スタッフ';
+  var staffEl = document.getElementById('staff-name-display');
+  if (staffEl) staffEl.textContent = currentFamily.staffName || '担当スタッフ';
+
   // 最低希望日を明日に設定
   var tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -113,7 +115,7 @@ function renderFamilyChat() {
       '<div class="chat-content">' +
       '<div class="chat-name">' + esc(m['送信者']) + '</div>' +
       '<div class="chat-text">' + esc(m['本文']).replace(/\n/g,'<br>') + '</div>' +
-      '<div class="chat-time">' + esc(String(m['送信日'])) + '</div>' +
+      '<div class="chat-time">' + esc(String(m['送信日時'])) + '</div>' +
       '</div></div>';
   }).join('');
   wrap.scrollTop = wrap.scrollHeight;
@@ -147,8 +149,8 @@ function renderFamilyVisits() {
     var badgeClass = st === '申請中' ? 'badge-pending' : st === '承認' ? 'badge-approved' : 'badge-rejected';
     return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)">' +
       '<span class="badge ' + badgeClass + '">' + esc(st) + '</span>' +
-      '<div><div style="font-weight:600;font-size:14px">' + esc(String(v['希望日'])) + ' ' + esc(v['希望時間']) + '</div>' +
-      '<div style="font-size:12px;color:var(--gray-500)">' + esc(v['目的']) + ' / ' + esc(String(v['人数'])) + '名</div></div>' +
+      '<div><div style="font-weight:600;font-size:14px">' + formatDate(v['希望日']) + ' ' + esc(v['希望時間']) + '</div>' +
+      '<div style="font-size:12px;color:var(--gray-500)">' + esc(v['備考'] || v['目的'] || '') + ' / ' + esc(String(v['人数'] || '')) + '名</div></div>' +
       '</div>';
   }).join('');
 }
