@@ -45,10 +45,7 @@
       </div>
       <div class="portal-user">
         <div class="avatar" id="family-avatar">家</div>
-        <div style="display:flex;flex-direction:column;line-height:1.3">
-          <span id="family-name-display" style="font-size:14px;font-weight:600"></span>
-          <span style="font-size:11px;opacity:.75">担当：<span id="staff-name-display"></span></span>
-        </div>
+        <span id="family-name-display"></span>
         <button onclick="logout()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;margin-left:12px;cursor:pointer">ログアウト</button>
       </div>
     </header>
@@ -155,6 +152,85 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- 面会予約 確認モーダル -->
+  <div id="visit-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="width:56px;height:56px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+          <i class="fa fa-calendar-check" style="font-size:24px;color:#3b82f6"></i>
+        </div>
+        <h3 style="font-size:17px;font-weight:700;color:#1e293b;margin:0 0 4px">予約内容の確認</h3>
+        <p style="font-size:13px;color:#64748b;margin:0">以下の内容で申請します。よろしいですか?</p>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:20px;font-size:14px">
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">入居者</span>
+          <strong id="confirm-resident" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">希望日</span>
+          <strong id="confirm-date" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">希望時間</span>
+          <strong id="confirm-time" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">人数</span>
+          <strong id="confirm-people" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0">
+          <span style="color:#64748b">目的</span>
+          <strong id="confirm-purpose" style="color:#1e293b"></strong>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="closeVisitConfirm()" style="flex:1;padding:12px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;font-size:14px;font-weight:600;cursor:pointer">
+          <i class="fa fa-arrow-left"></i> 戻る
+        </button>
+        <button id="confirm-ok-btn" style="flex:1;padding:12px;border:none;border-radius:8px;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;cursor:pointer">
+          <i class="fa fa-paper-plane"></i> 申請する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 面会予約 完了モーダル -->
+  <div id="visit-complete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center">
+      <div style="width:64px;height:64px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i class="fa fa-check" style="font-size:28px;color:#16a34a"></i>
+      </div>
+      <h3 style="font-size:18px;font-weight:700;color:#1e293b;margin:0 0 8px">申請が完了しました!</h3>
+      <p style="font-size:13px;color:#64748b;margin:0 0 20px">施設スタッフが確認後、承認いたします。<br>しばらくお待ちください。</p>
+      <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px;text-align:left">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">希望日</span>
+          <strong id="complete-date" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">希望時間</span>
+          <strong id="complete-time" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0">
+          <span style="color:#64748b">人数</span>
+          <strong id="complete-people" style="color:#1e293b"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0">
+          <span style="color:#64748b">目的</span>
+          <strong id="complete-purpose" style="color:#1e293b"></strong>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;text-align:left;margin-bottom:20px">
+        <i class="fa fa-phone" style="margin-right:6px"></i>
+        <strong>キャンセルの場合は施設へお電話ください。</strong>
+      </div>
+      <button onclick="closeVisitComplete()" style="width:100%;padding:13px;border:none;border-radius:8px;background:#3b82f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer">
+        <i class="fa fa-check"></i> 閉じる
+      </button>
     </div>
   </div>
 
