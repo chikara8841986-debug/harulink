@@ -353,12 +353,18 @@ function renderVisits(data) {
     return;
   }
   tbody.innerHTML = rows.slice().reverse().map(function(v) {
-    var st = v['ステータス'] || '';
-    var badgeClass = st === '申請中' ? 'badge-pending' : st === '承認' ? 'badge-approved' : 'badge-rejected';
+    var st = v['ステータス'] || v['状態'] || '';
+    var badgeClass = st === '申請中' ? 'badge-pending'
+                   : st === '承認'   ? 'badge-approved'
+                   : st === 'キャンセル' ? 'badge-cancel'
+                   : 'badge-rejected';
     var btns = '';
     if (st === '申請中') {
-      btns = '<button class="btn-icon btn-approve" onclick="approveVisit(\'' + v['ID'] + '\',\'承認\')" title="承認"><i class="fa fa-check"></i></button>' +
-             '<button class="btn-icon btn-reject" onclick="approveVisit(\'' + v['ID'] + '\',\'却下\')" title="却下"><i class="fa fa-times"></i></button>';
+      btns = '<button class="btn-icon btn-approve" onclick="approveVisit(\'' + (v['ID']||v['予約ID']) + '\',\'承認\')" title="承認"><i class="fa fa-check"></i></button>' +
+             '<button class="btn-icon btn-reject" onclick="approveVisit(\'' + (v['ID']||v['予約ID']) + '\',\'却下\')" title="却下"><i class="fa fa-times"></i></button>' +
+             '<button class="btn-icon btn-cancel" onclick="cancelVisit(\'' + (v['ID']||v['予約ID']) + '\')" title="キャンセル" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0"><i class="fa fa-ban"></i></button>';
+    } else if (st === '承認') {
+      btns = '<button class="btn-icon btn-cancel" onclick="cancelVisit(\'' + (v['ID']||v['予約ID']) + '\')" title="キャンセル" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0"><i class="fa fa-ban"></i></button>';
     }
     return '<tr>' +
       '<td><span class="badge ' + badgeClass + '">' + esc(st) + '</span></td>' +
@@ -367,7 +373,7 @@ function renderVisits(data) {
       '<td>' + esc(String(v['希望日'])) + '</td>' +
       '<td>' + esc(v['希望時間']) + '</td>' +
       '<td>' + esc(String(v['人数'])) + '</td>' +
-      '<td>' + esc(v['目的']) + '</td>' +
+      '<td>' + esc(v['目的'] || v['備考'] || '') + '</td>' +
       '<td style="color:var(--gray-500);font-size:12px">' + esc(String(v['申請日時'])) + '</td>' +
       '<td><div style="display:flex;gap:4px">' + btns + '</div></td>' +
       '</tr>';
@@ -389,7 +395,20 @@ function approveVisit(id, status) {
   showLoading();
   callAPI('approveVisit', { id: id, status: status })
     .then(function() {
-      showToast(status === '承認' ? '面会を承認しました' : '面会を却下しました', status === '承認' ? 'success' : 'warning');
+      var msg = status === '承認' ? '面会を承認しました' : '面会を却下しました';
+      var type = status === '承認' ? 'success' : 'warning';
+      showToast(msg, type);
+      loadAll();
+    })
+    .catch(function() { hideLoading(); showToast('操作に失敗しました', 'error'); });
+}
+
+function cancelVisit(id) {
+  if (!confirm('この面会予約をキャンセルしますか？\n（ご家族にはお電話でご連絡ください）')) return;
+  showLoading();
+  callAPI('approveVisit', { id: id, status: 'キャンセル' })
+    .then(function() {
+      showToast('面会予約をキャンセルしました', 'warning');
       loadAll();
     })
     .catch(function() { hideLoading(); showToast('操作に失敗しました', 'error'); });
