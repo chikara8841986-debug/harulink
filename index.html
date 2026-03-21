@@ -355,7 +355,7 @@
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>利用者ID</th><th>氏名</th><th>部屋番号</th><th>入居日</th><th>担当スタッフ</th><th style="width:100px">操作</th></tr>
+              <tr><th>利用者ID</th><th>氏名</th><th>部屋番号</th><th>入居日</th><th>担当スタッフ</th><th style="width:140px">操作</th></tr>
             </thead>
             <tbody id="residents-tbody">
               <tr><td colspan="6" class="table-empty">読み込み中...</td></tr>
@@ -728,6 +728,38 @@
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeModal('modal-add-staff')">キャンセル</button>
         <button class="btn-primary" onclick="addStaff()"><i class="fa fa-save"></i> 登録</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 写真アップロードモーダル -->
+  <div class="modal-overlay" id="modal-upload-photo">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa fa-camera"></i> 写真を追加</h3>
+        <button class="modal-close" onclick="closeModal('modal-upload-photo')"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="photo-resident-id">
+        <div class="form-group">
+          <label id="photo-resident-label" style="font-size:13px;color:var(--gray-500)">利用者：</label>
+        </div>
+        <div class="form-group">
+          <label>写真を選択 <span class="required">*</span></label>
+          <input type="file" id="photo-file" accept="image/*" multiple style="border:1.5px solid var(--gray-200);border-radius:8px;padding:8px;width:100%;font-size:13px">
+          <div id="photo-preview-wrap" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+        </div>
+        <div class="form-group">
+          <label>メモ（コメント）</label>
+          <input type="text" id="photo-memo" placeholder="例：お散歩中の様子" maxlength="50">
+        </div>
+        <div id="photo-upload-progress" style="display:none;font-size:13px;color:var(--gray-500);margin-top:4px">
+          <i class="fa fa-spinner fa-spin"></i> アップロード中...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-upload-photo')">キャンセル</button>
+        <button class="btn-primary" onclick="uploadPhotos()"><i class="fa fa-upload"></i> アップロード</button>
       </div>
     </div>
   </div>
