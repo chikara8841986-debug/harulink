@@ -331,6 +331,7 @@ textarea { resize: vertical; }
 .badge-pending { background: #FEF3C7; color: #92400E; }
 .badge-approved { background: #D1FAE5; color: #065F46; }
 .badge-rejected { background: #FEE2E2; color: #991B1B; }
+.badge-cancel { background: #F1F5F9; color: #64748B; }
 .badge-unread { background: #DBEAFE; color: #1E40AF; }
 .badge-read { background: var(--gray-100); color: var(--gray-500); }
 
