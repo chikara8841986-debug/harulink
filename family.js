@@ -4,7 +4,7 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxDjkUXCAxHeyKH-j0iNwB2OoWEAizP094vrUynWOyW9TOUFNqXdPeDCZ2AqNzz0F4Swg/exec';
 
 var currentFamily = null;
-var familyData = { messages: [], visits: [], notices: [] };
+var familyData = { messages: [], visits: [], notices: [], photos: [] };
 
 function callAPI(action, params) {
   var qs = 'action=' + encodeURIComponent(action);
@@ -38,7 +38,9 @@ function togglePass(id) {
   input.type = input.type === 'password' ? 'text' : 'password';
 }
 
+// ============================================================
 // ログイン
+// ============================================================
 document.getElementById('login-form').addEventListener('submit', function(e) {
   e.preventDefault();
   var pass = document.getElementById('login-pass').value;
@@ -65,11 +67,12 @@ function initFamilyApp() {
   var staffEl = document.getElementById('staff-name-display');
   if (staffEl) staffEl.textContent = currentFamily.staffName || '担当スタッフ';
 
-  // 最低希望日を明日に設定
   var tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   document.getElementById('v-date').min = tomorrow.toISOString().slice(0,10);
   document.getElementById('v-date').value = tomorrow.toISOString().slice(0,10);
+
+  showPortalPage('notices', document.querySelector('.portal-nav-item[data-page="notices"]'));
 
   loadFamilyData();
   setInterval(loadFamilyData, 30000);
@@ -82,6 +85,9 @@ function logout() {
   document.getElementById('login-pass').value = '';
 }
 
+// ============================================================
+// ページ切り替え
+// ============================================================
 function showPortalPage(name, el) {
   document.querySelectorAll('.portal-page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.portal-nav-item').forEach(function(n) { n.classList.remove('active'); });
@@ -89,19 +95,27 @@ function showPortalPage(name, el) {
   if (el) el.classList.add('active');
 }
 
+// ============================================================
+// データ読み込み
+// ============================================================
 function loadFamilyData() {
   callAPI('getFamilyData', { familyId: currentFamily.id })
     .then(function(data) {
       familyData.messages = data.messages || [];
       familyData.visits   = data.visits   || [];
       familyData.notices  = data.notices  || [];
+      familyData.photos   = data.photos   || [];
       renderFamilyChat();
       renderFamilyVisits();
       renderFamilyNotices();
+      renderFamilyPhotos();
     })
     .catch(function() {});
 }
 
+// ============================================================
+// チャット
+// ============================================================
 function renderFamilyChat() {
   var wrap = document.getElementById('family-chat-wrap');
   if (familyData.messages.length === 0) {
@@ -138,6 +152,9 @@ function familySendMessage() {
   .catch(function() { showToast('送信に失敗しました', 'error'); });
 }
 
+// ============================================================
+// 面会予約
+// ============================================================
 function renderFamilyVisits() {
   var el = document.getElementById('family-visits-list');
   if (familyData.visits.length === 0) {
@@ -159,7 +176,6 @@ function renderFamilyVisits() {
       '</div>';
   }).join('');
 
-  // キャンセルのご案内
   var cancelNote = '<div style="margin-top:16px;padding:12px 14px;background:#fff8e1;border-left:4px solid #f59e0b;border-radius:6px;font-size:13px;color:#92400e;">' +
     '<i class="fa fa-phone" style="margin-right:6px"></i>' +
     '<strong>予約のキャンセルは施設へお電話ください。</strong><br>' +
@@ -176,7 +192,6 @@ function familyRequestVisit() {
   var purpose = document.getElementById('v-purpose').value;
   if (!date) { showToast('希望日を選択してください', 'warning'); return; }
 
-  // 確認ダイアログを表示
   var d = new Date(date);
   var dateStr = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
   document.getElementById('confirm-date').textContent    = dateStr;
@@ -186,7 +201,6 @@ function familyRequestVisit() {
   document.getElementById('confirm-resident').textContent = currentFamily.residentName || '';
   document.getElementById('visit-confirm-modal').style.display = 'flex';
 
-  // OKボタンに送信処理をセット
   document.getElementById('confirm-ok-btn').onclick = function() {
     document.getElementById('visit-confirm-modal').style.display = 'none';
     callAPI('requestVisit', {
@@ -219,6 +233,9 @@ function closeVisitComplete() {
   document.getElementById('visit-complete-modal').style.display = 'none';
 }
 
+// ============================================================
+// お知らせ
+// ============================================================
 function renderFamilyNotices() {
   var el = document.getElementById('family-notices-list');
   if (familyData.notices.length === 0) {
@@ -234,6 +251,50 @@ function renderFamilyNotices() {
   }).join('');
 }
 
+// ============================================================
+// 写真
+// ============================================================
+function renderFamilyPhotos() {
+  var el = document.getElementById('family-photos-list');
+  if (!familyData.photos || familyData.photos.length === 0) {
+    el.innerHTML = '<div class="empty-state"><i class="fa fa-image"></i><p>写真はまだありません</p></div>';
+    return;
+  }
+
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:4px">';
+  familyData.photos.forEach(function(p) {
+    var url    = p['画像URL'] || p['url'] || '';
+    var date   = p['撮影日時'] || p['date'] || '';
+    var memo   = p['メモ'] || p['memo'] || '';
+    if (!url) return;
+    html += '<div style="border-radius:10px;overflow:hidden;background:#f8fafc;box-shadow:0 2px 8px rgba(0,0,0,.07);cursor:pointer" onclick="openPhotoModal(\'' + url.replace(/'/g,"\\'") + '\',\'' + esc(date) + ' ' + esc(memo) + '\')">' +
+      '<div style="width:100%;aspect-ratio:1/1;overflow:hidden">' +
+        '<img src="' + url + '" alt="' + esc(memo) + '" style="width:100%;height:100%;object-fit:cover;transition:transform .2s" loading="lazy" onerror="this.parentNode.style.background=\'#e2e8f0\'">' +
+      '</div>' +
+      '<div style="padding:8px 10px">' +
+        '<div style="font-size:11px;color:#64748b">' + esc(date) + '</div>' +
+        (memo ? '<div style="font-size:12px;color:#334155;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(memo) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function openPhotoModal(url, caption) {
+  document.getElementById('photo-modal-img').src = url;
+  document.getElementById('photo-modal-caption').textContent = caption;
+  document.getElementById('photo-modal').style.display = 'flex';
+}
+
+function closePhotoModal() {
+  document.getElementById('photo-modal').style.display = 'none';
+  document.getElementById('photo-modal-img').src = '';
+}
+
+// ============================================================
+// ユーティリティ
+// ============================================================
 function esc(str) {
   if (str === undefined || str === null) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
