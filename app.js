@@ -547,7 +547,10 @@ function renderResidents(data) {
       '<td>' + esc(r['部屋番号']) + '</td>' +
       '<td style="color:var(--gray-500);font-size:12px">' + esc(String(r['入居日']||'')) + '</td>' +
       '<td>' + esc(r['担当スタッフ']||'') + '</td>' +
-      '<td><button class="btn-icon btn-delete" onclick="deleteResident(\'' + r['ID'] + '\')" title="削除"><i class="fa fa-trash"></i></button></td>' +
+      '<td><div style="display:flex;gap:4px">' +
+        '<button class="btn-icon" onclick="openPhotoUpload(\'' + esc(String(r[\'ID\']||'')) + '\',\'' + esc(r[\'氏名\']) + '\')" title="写真追加" style="background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe"><i class="fa fa-camera"></i></button>' +
+        '<button class="btn-icon btn-delete" onclick="deleteResident(\'' + r['ID'] + '\')" title="削除"><i class="fa fa-trash"></i></button>' +
+      '</div></td>' +
       '</tr>';
   }).join('');
 }
@@ -782,6 +785,80 @@ function populateSelects() {
       return '<option value="' + esc(c['氏名']) + '">' + esc(c['氏名']) + '（' + esc(c['所属']) + '）</option>';
     }).join('');
   cmSel.value = curCm;
+}
+
+// ============================================================
+// 写真アップロード
+// ============================================================
+function openPhotoUpload(residentId, residentName) {
+  document.getElementById('photo-resident-id').value = residentId;
+  document.getElementById('photo-resident-label').textContent = '利用者：' + residentName;
+  document.getElementById('photo-file').value = '';
+  document.getElementById('photo-memo').value = '';
+  document.getElementById('photo-preview-wrap').innerHTML = '';
+  document.getElementById('photo-upload-progress').style.display = 'none';
+  openModal('modal-upload-photo');
+}
+
+// ファイル選択時プレビュー
+document.addEventListener('DOMContentLoaded', function() {
+  var fileInput = document.getElementById('photo-file');
+  if (fileInput) {
+    fileInput.addEventListener('change', function() {
+      var wrap = document.getElementById('photo-preview-wrap');
+      wrap.innerHTML = '';
+      Array.from(this.files).forEach(function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0';
+          wrap.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  }
+});
+
+function uploadPhotos() {
+  var residentId = document.getElementById('photo-resident-id').value;
+  var memo = document.getElementById('photo-memo').value.trim();
+  var files = document.getElementById('photo-file').files;
+  if (!files || files.length === 0) { showToast('写真を選択してください', 'warning'); return; }
+
+  var progress = document.getElementById('photo-upload-progress');
+  progress.style.display = 'block';
+
+  // 各ファイルをBase64化してGASに送信
+  var promises = Array.from(files).map(function(file) {
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64 = e.target.result.split(',')[1];
+        callAPI('uploadPhoto', {
+          residentId: residentId,
+          fileName: file.name,
+          mimeType: file.type,
+          data: base64,
+          memo: memo,
+          uploader: currentUser.name
+        }).then(resolve).catch(reject);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  Promise.all(promises)
+    .then(function() {
+      progress.style.display = 'none';
+      closeModal('modal-upload-photo');
+      showToast('写真をアップロードしました');
+    })
+    .catch(function() {
+      progress.style.display = 'none';
+      showToast('アップロードに失敗しました', 'error');
+    });
 }
 
 // ============================================================
