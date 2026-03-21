@@ -144,15 +144,29 @@ function renderFamilyVisits() {
     el.innerHTML = '<div class="empty-state"><i class="fa fa-calendar"></i><p>予約履歴はありません</p></div>';
     return;
   }
-  el.innerHTML = familyData.visits.slice().reverse().map(function(v) {
+  var listHtml = familyData.visits.slice().reverse().map(function(v) {
     var st = v['ステータス'] || '';
-    var badgeClass = st === '申請中' ? 'badge-pending' : st === '承認' ? 'badge-approved' : 'badge-rejected';
-    return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)">' +
+    var badgeClass = st === '申請中' ? 'badge-pending'
+                   : st === '承認'   ? 'badge-approved'
+                   : st === 'キャンセル' ? 'badge-cancel'
+                   : 'badge-rejected';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)">' +
       '<span class="badge ' + badgeClass + '">' + esc(st) + '</span>' +
-      '<div><div style="font-weight:600;font-size:14px">' + formatDate(v['希望日']) + ' ' + esc(v['希望時間']) + '</div>' +
-      '<div style="font-size:12px;color:var(--gray-500)">' + esc(v['備考'] || v['目的'] || '') + ' / ' + esc(String(v['人数'] || '')) + '名</div></div>' +
+      '<div style="flex:1">' +
+        '<div style="font-weight:600;font-size:14px">' + formatDate(v['希望日']) + ' ' + esc(v['希望時間']) + '</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">' + esc(v['目的'] || v['備考'] || '') + ' / ' + esc(String(v['人数'] || '')) + '名</div>' +
+      '</div>' +
       '</div>';
   }).join('');
+
+  // キャンセルのご案内
+  var cancelNote = '<div style="margin-top:16px;padding:12px 14px;background:#fff8e1;border-left:4px solid #f59e0b;border-radius:6px;font-size:13px;color:#92400e;">' +
+    '<i class="fa fa-phone" style="margin-right:6px"></i>' +
+    '<strong>予約のキャンセルは施設へお電話ください。</strong><br>' +
+    '<span style="font-size:12px;margin-top:4px;display:block">ご来院できなくなった場合は、お早めにご連絡いただけますと助かります。</span>' +
+    '</div>';
+
+  el.innerHTML = listHtml + cancelNote;
 }
 
 function familyRequestVisit() {
@@ -161,17 +175,48 @@ function familyRequestVisit() {
   var people = document.getElementById('v-people').value;
   var purpose = document.getElementById('v-purpose').value;
   if (!date) { showToast('希望日を選択してください', 'warning'); return; }
-  callAPI('requestVisit', {
-    applicant: currentFamily.name,
-    residentName: currentFamily.residentName,
-    familyId: currentFamily.id,
-    date: date, time: time, people: people, purpose: purpose
-  })
-  .then(function() {
-    showToast('面会予約を申請しました');
-    loadFamilyData();
-  })
-  .catch(function() { showToast('申請に失敗しました', 'error'); });
+
+  // 確認ダイアログを表示
+  var d = new Date(date);
+  var dateStr = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日';
+  document.getElementById('confirm-date').textContent    = dateStr;
+  document.getElementById('confirm-time').textContent    = time;
+  document.getElementById('confirm-people').textContent  = people + '名';
+  document.getElementById('confirm-purpose').textContent = purpose;
+  document.getElementById('confirm-resident').textContent = currentFamily.residentName || '';
+  document.getElementById('visit-confirm-modal').style.display = 'flex';
+
+  // OKボタンに送信処理をセット
+  document.getElementById('confirm-ok-btn').onclick = function() {
+    document.getElementById('visit-confirm-modal').style.display = 'none';
+    callAPI('requestVisit', {
+      applicant: currentFamily.name,
+      residentName: currentFamily.residentName,
+      familyId: currentFamily.id,
+      date: date, time: time, people: people, purpose: purpose
+    })
+    .then(function() {
+      showVisitComplete(dateStr, time, people, purpose);
+      loadFamilyData();
+    })
+    .catch(function() { showToast('申請に失敗しました', 'error'); });
+  };
+}
+
+function closeVisitConfirm() {
+  document.getElementById('visit-confirm-modal').style.display = 'none';
+}
+
+function showVisitComplete(dateStr, time, people, purpose) {
+  document.getElementById('complete-date').textContent    = dateStr;
+  document.getElementById('complete-time').textContent    = time;
+  document.getElementById('complete-people').textContent  = people + '名';
+  document.getElementById('complete-purpose').textContent = purpose;
+  document.getElementById('visit-complete-modal').style.display = 'flex';
+}
+
+function closeVisitComplete() {
+  document.getElementById('visit-complete-modal').style.display = 'none';
 }
 
 function renderFamilyNotices() {
