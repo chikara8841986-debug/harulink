@@ -1,25 +1,13 @@
 // ============================================================
-// HaruLink - ケアマネ向けポータル
+// HaruLink - ケアマネ向けポータル（Firebase版）
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxDjkUXCAxHeyKH-j0iNwB2OoWEAizP094vrUynWOyW9TOUFNqXdPeDCZ2AqNzz0F4Swg/exec';
 
-var currentCM = null;
+var currentCM = null;  // { id, name, org, email }
 var cmMessages = [];
 
-function callAPI(action, params) {
-  var qs = 'action=' + encodeURIComponent(action);
-  var p = params || {};
-  Object.keys(p).forEach(function(k) {
-    qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-  });
-  return fetch(GAS_URL + '?' + qs)
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    if (data.error) throw new Error(data.error);
-    return data;
-  });
-}
-
+// ============================================================
+// ユーティリティ
+// ============================================================
 function showToast(msg, type) {
   var icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
   var t = type || 'success';
@@ -38,23 +26,60 @@ function togglePass(id) {
   input.type = input.type === 'password' ? 'text' : 'password';
 }
 
+function esc(str) {
+  if (str === undefined || str === null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function fmtDate(ts) {
+  if (!ts) return '';
+  var d = ts.toDate ? ts.toDate() : new Date(ts);
+  if (isNaN(d.getTime())) return String(ts);
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0') +
+         ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function nowTimestamp() {
+  return firebase.firestore.FieldValue.serverTimestamp();
+}
+
+// ============================================================
 // ログイン
+// ============================================================
 document.getElementById('login-form').addEventListener('submit', function(e) {
   e.preventDefault();
+  var email = document.getElementById('login-email')
+    ? document.getElementById('login-email').value.trim()
+    : '';
   var pass = document.getElementById('login-pass').value;
   var errEl = document.getElementById('login-error');
   errEl.style.display = 'none';
 
-  callAPI('loginCareManager', { password: pass })
-    .then(function(data) {
-      if (data.success && data.user) {
-        currentCM = data.user;
-        initCMApp();
-      } else {
-        errEl.style.display = 'block';
-      }
+  if (!email) {
+    errEl.style.display = 'block';
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(function() {
+      return db.collection(COLLECTIONS.CAREMANAGERS).where('email', '==', email).limit(1).get();
     })
-    .catch(function() { errEl.style.display = 'block'; });
+    .then(function(snapshot) {
+      if (snapshot.empty) throw new Error('ケアマネ情報が見つかりません');
+      var doc = snapshot.docs[0];
+      var data = doc.data();
+      currentCM = {
+        id: doc.id,
+        name: data.name,
+        org: data.org || '',
+        email: data.email
+      };
+      initCMApp();
+    })
+    .catch(function(err) {
+      console.error('CM login error:', err);
+      errEl.style.display = 'block';
+    });
 });
 
 function initCMApp() {
@@ -68,23 +93,39 @@ function initCMApp() {
 }
 
 function logout() {
-  currentCM = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-pass').value = '';
+  auth.signOut().then(function() {
+    currentCM = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('login-pass').value = '';
+    var emailEl = document.getElementById('login-email');
+    if (emailEl) emailEl.value = '';
+  });
 }
 
+// ============================================================
+// データ読み込み（Firestore）
+// ============================================================
 function loadCMData() {
-  callAPI('getCareManagerData', { careManagerId: currentCM.id })
-    .then(function(data) {
-      cmMessages = data.messages || [];
+  if (!currentCM) return;
+  db.collection(COLLECTIONS.MESSAGES)
+    .where('type', '==', 'ケアマネ')
+    .where('careManagerId', '==', currentCM.id)
+    .orderBy('createdAt', 'asc')
+    .get()
+    .then(function(snapshot) {
+      // このケアマネ宛 + このケアマネからのメッセージ
+      cmMessages = snapshot.docs.map(function(d) { return Object.assign({id: d.id}, d.data()); });
       renderCMChat();
       var updated = document.getElementById('cm-last-updated');
       if (updated) updated.textContent = '最終更新: ' + new Date().toLocaleTimeString('ja-JP');
     })
-    .catch(function() {});
+    .catch(function(err) { console.error('loadCMData error:', err); });
 }
 
+// ============================================================
+// チャット表示
+// ============================================================
 function renderCMChat() {
   var wrap = document.getElementById('cm-chat-wrap');
   if (cmMessages.length === 0) {
@@ -92,34 +133,37 @@ function renderCMChat() {
     return;
   }
   wrap.innerHTML = cmMessages.map(function(m) {
-    var isMine = m['送信者'] === currentCM.name;
+    var isMine = m.sender === currentCM.name;
     return '<div class="chat-bubble ' + (isMine ? 'mine' : '') + '">' +
       '<div class="chat-avatar">' + (isMine ? esc(currentCM.name[0]) : '施') + '</div>' +
       '<div class="chat-content">' +
-      '<div class="chat-name">' + esc(m['送信者']) + (m['件名'] ? '　' + esc(m['件名']) : '') + '</div>' +
-      '<div class="chat-text">' + esc(m['本文']).replace(/\n/g,'<br>') + '</div>' +
-      '<div class="chat-time">' + esc(String(m['送信日時'])) + '</div>' +
+      '<div class="chat-name">' + esc(m.sender) + (m.subject ? '　' + esc(m.subject) : '') + '</div>' +
+      '<div class="chat-text">' + esc(m.body).replace(/\n/g,'<br>') + '</div>' +
+      '<div class="chat-time">' + fmtDate(m.createdAt) + '</div>' +
       '</div></div>';
   }).join('');
   wrap.scrollTop = wrap.scrollHeight;
 }
 
+// ============================================================
+// メッセージ送信
+// ============================================================
 function cmSendMessage() {
   var body = document.getElementById('cm-msg-input').value.trim();
   if (!body) return;
-  callAPI('sendCareManagerMessage', {
+  db.collection(COLLECTIONS.MESSAGES).add({
     sender: currentCM.name,
     receiver: '施設管理者',
-    message: body,
+    body: body,
     careManagerId: currentCM.id,
-    kind: 'ケアマネから'
-  })
-  .then(function() {
+    type: 'ケアマネ',
+    isRead: false,
+    createdAt: nowTimestamp()
+  }).then(function() {
     document.getElementById('cm-msg-input').value = '';
     showToast('送信しました');
     loadCMData();
-  })
-  .catch(function() { showToast('送信に失敗しました', 'error'); });
+  }).catch(function() { showToast('送信に失敗しました', 'error'); });
 }
 
 // Enterキーで送信（Shift+Enterは改行）
@@ -129,8 +173,3 @@ document.getElementById('cm-msg-input').addEventListener('keydown', function(e) 
     cmSendMessage();
   }
 });
-
-function esc(str) {
-  if (str === undefined || str === null) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}

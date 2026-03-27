@@ -19,6 +19,13 @@
       </div>
       <form id="login-form" class="login-form">
         <div class="form-group">
+          <label>メールアドレス</label>
+          <div class="input-icon-wrap">
+            <i class="fa fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="登録されたメールアドレス" required>
+          </div>
+        </div>
+        <div class="form-group">
           <label>パスワード</label>
           <div class="input-icon-wrap">
             <i class="fa fa-lock"></i>
@@ -26,7 +33,7 @@
             <button type="button" class="toggle-pass" onclick="togglePass('login-pass')"><i class="fa fa-eye"></i></button>
           </div>
         </div>
-        <div id="login-error" class="login-error" style="display:none">パスワードが正しくありません</div>
+        <div id="login-error" class="login-error" style="display:none">メールアドレスまたはパスワードが正しくありません</div>
         <button type="submit" class="btn-login">ログイン <i class="fa fa-arrow-right"></i></button>
       </form>
       <div class="login-links">
@@ -50,32 +57,32 @@
       </div>
     </header>
 
+    <!-- ナビ：お知らせ → 面会予約 → 写真 → メッセージ -->
     <nav class="portal-nav">
-      <div class="portal-nav-item active" data-page="messages" onclick="showPortalPage('messages',this)">
-        <i class="fa fa-comment-dots"></i> メッセージ
+      <div class="portal-nav-item active" data-page="notices" onclick="showPortalPage('notices',this)">
+        <i class="fa fa-bell"></i> お知らせ
       </div>
       <div class="portal-nav-item" data-page="visits" onclick="showPortalPage('visits',this)">
         <i class="fa fa-calendar-check"></i> 面会予約
       </div>
-      <div class="portal-nav-item" data-page="notices" onclick="showPortalPage('notices',this)">
-        <i class="fa fa-bell"></i> お知らせ
+      <div class="portal-nav-item" data-page="photos" onclick="showPortalPage('photos',this)">
+        <i class="fa fa-images"></i> 写真
+      </div>
+      <div class="portal-nav-item" data-page="messages" onclick="showPortalPage('messages',this)">
+        <i class="fa fa-comment-dots"></i> メッセージ
       </div>
     </nav>
 
     <div class="portal-main">
 
-      <!-- メッセージ -->
-      <div class="portal-page active" id="portal-page-messages">
+      <!-- お知らせ（最初に表示） -->
+      <div class="portal-page active" id="portal-page-notices">
         <div class="portal-card">
           <div class="portal-card-header">
-            <h3><i class="fa fa-comment-dots"></i> 担当スタッフとのメッセージ</h3>
+            <h3><i class="fa fa-bell"></i> 施設からのお知らせ</h3>
           </div>
-          <div class="chat-wrap" id="family-chat-wrap">
-            <div class="empty-state"><i class="fa fa-comment"></i><p>メッセージはありません</p></div>
-          </div>
-          <div class="chat-input-area">
-            <textarea id="family-msg-input" rows="2" placeholder="メッセージを入力..."></textarea>
-            <button class="chat-send-btn" onclick="familySendMessage()"><i class="fa fa-paper-plane"></i></button>
+          <div id="family-notices-list">
+            <div class="empty-state"><i class="fa fa-bell-slash"></i><p>お知らせはありません</p></div>
           </div>
         </div>
       </div>
@@ -140,14 +147,30 @@
         </div>
       </div>
 
-      <!-- お知らせ -->
-      <div class="portal-page" id="portal-page-notices">
+      <!-- 写真 -->
+      <div class="portal-page" id="portal-page-photos">
         <div class="portal-card">
           <div class="portal-card-header">
-            <h3><i class="fa fa-bell"></i> 施設からのお知らせ</h3>
+            <h3><i class="fa fa-images"></i> ご利用者の写真</h3>
           </div>
-          <div id="family-notices-list">
-            <div class="empty-state"><i class="fa fa-bell-slash"></i><p>お知らせはありません</p></div>
+          <div id="family-photos-list">
+            <div class="empty-state"><i class="fa fa-image"></i><p>写真はまだありません</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- メッセージ -->
+      <div class="portal-page" id="portal-page-messages">
+        <div class="portal-card">
+          <div class="portal-card-header">
+            <h3><i class="fa fa-comment-dots"></i> 担当スタッフとのメッセージ</h3>
+          </div>
+          <div class="chat-wrap" id="family-chat-wrap">
+            <div class="empty-state"><i class="fa fa-comment"></i><p>メッセージはありません</p></div>
+          </div>
+          <div class="chat-input-area">
+            <textarea id="family-msg-input" rows="2" placeholder="メッセージを入力..."></textarea>
+            <button class="chat-send-btn" onclick="familySendMessage()"><i class="fa fa-paper-plane"></i></button>
           </div>
         </div>
       </div>
@@ -234,7 +257,21 @@
     </div>
   </div>
 
+  <!-- 写真 拡大モーダル -->
+  <div id="photo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9100;align-items:center;justify-content:center;padding:16px" onclick="closePhotoModal()">
+    <div style="max-width:90vw;max-height:90vh;position:relative" onclick="event.stopPropagation()">
+      <img id="photo-modal-img" src="" alt="" style="max-width:100%;max-height:80vh;border-radius:8px;display:block">
+      <div id="photo-modal-caption" style="text-align:center;color:#fff;font-size:14px;margin-top:10px"></div>
+      <button onclick="closePhotoModal()" style="position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:50%;background:#fff;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3)">×</button>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
+  <!-- Firebase CDN SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="firebase.js"></script>
   <script src="family.js"></script>
 </body>
 </html>

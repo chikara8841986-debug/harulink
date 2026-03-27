@@ -1,25 +1,13 @@
 // ============================================================
-// HaruLink - 家族向けポータル
+// HaruLink - 家族向けポータル（Firebase版）
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxDjkUXCAxHeyKH-j0iNwB2OoWEAizP094vrUynWOyW9TOUFNqXdPeDCZ2AqNzz0F4Swg/exec';
 
-var currentFamily = null;
+var currentFamily = null;  // { id, name, residentName, residentId, staffName, email }
 var familyData = { messages: [], visits: [], notices: [], photos: [] };
 
-function callAPI(action, params) {
-  var qs = 'action=' + encodeURIComponent(action);
-  var p = params || {};
-  Object.keys(p).forEach(function(k) {
-    qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
-  });
-  return fetch(GAS_URL + '?' + qs)
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    if (data.error) throw new Error(data.error);
-    return data;
-  });
-}
-
+// ============================================================
+// ユーティリティ
+// ============================================================
 function showToast(msg, type) {
   var icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
   var t = type || 'success';
@@ -38,25 +26,74 @@ function togglePass(id) {
   input.type = input.type === 'password' ? 'text' : 'password';
 }
 
+function esc(str) {
+  if (str === undefined || str === null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function fmtDate(ts) {
+  if (!ts) return '';
+  var d = ts.toDate ? ts.toDate() : new Date(ts);
+  if (isNaN(d.getTime())) return String(ts);
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0') +
+         ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function formatDate(val) {
+  if (!val) return '';
+  var d = new Date(val);
+  if (isNaN(d.getTime())) return String(val);
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+}
+
+function nowTimestamp() {
+  return firebase.firestore.FieldValue.serverTimestamp();
+}
+
 // ============================================================
 // ログイン
 // ============================================================
 document.getElementById('login-form').addEventListener('submit', function(e) {
   e.preventDefault();
+  var email = document.getElementById('login-email')
+    ? document.getElementById('login-email').value.trim()
+    : document.getElementById('login-pass').getAttribute('data-email') || '';
   var pass = document.getElementById('login-pass').value;
   var errEl = document.getElementById('login-error');
   errEl.style.display = 'none';
 
-  callAPI('loginFamily', { password: pass })
-    .then(function(data) {
-      if (data.success && data.user) {
-        currentFamily = data.user;
-        initFamilyApp();
-      } else {
-        errEl.style.display = 'block';
-      }
+  // メールアドレスフィールドがない場合（パスワードのみ入力の旧UI対応）
+  // Firestoreからemailを逆引き
+  if (!email) {
+    // パスワードでFirestore検索（family側はemail必須なので、ここではpassからの逆引きは行わない）
+    errEl.style.display = 'block';
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(function(userCred) {
+      var uid = userCred.user.uid;
+      // Firestoreから家族情報を取得
+      return db.collection(COLLECTIONS.FAMILIES).where('email', '==', email).limit(1).get();
     })
-    .catch(function() { errEl.style.display = 'block'; });
+    .then(function(snapshot) {
+      if (snapshot.empty) throw new Error('家族情報が見つかりません');
+      var doc = snapshot.docs[0];
+      var data = doc.data();
+      currentFamily = {
+        id: doc.id,
+        name: data.name,
+        residentName: data.residentName || '',
+        residentId: data.residentId || '',
+        staffName: data.staffName || '担当スタッフ',
+        email: data.email
+      };
+      initFamilyApp();
+    })
+    .catch(function(err) {
+      console.error('Family login error:', err);
+      errEl.style.display = 'block';
+    });
 });
 
 function initFamilyApp() {
@@ -73,16 +110,19 @@ function initFamilyApp() {
   document.getElementById('v-date').value = tomorrow.toISOString().slice(0,10);
 
   showPortalPage('notices', document.querySelector('.portal-nav-item[data-page="notices"]'));
-
   loadFamilyData();
   setInterval(loadFamilyData, 30000);
 }
 
 function logout() {
-  currentFamily = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-pass').value = '';
+  auth.signOut().then(function() {
+    currentFamily = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('login-pass').value = '';
+    var emailEl = document.getElementById('login-email');
+    if (emailEl) emailEl.value = '';
+  });
 }
 
 // ============================================================
@@ -96,21 +136,41 @@ function showPortalPage(name, el) {
 }
 
 // ============================================================
-// データ読み込み
+// データ読み込み（Firestore）
 // ============================================================
 function loadFamilyData() {
-  callAPI('getFamilyData', { familyId: currentFamily.id })
-    .then(function(data) {
-      familyData.messages = data.messages || [];
-      familyData.visits   = data.visits   || [];
-      familyData.notices  = data.notices  || [];
-      familyData.photos   = data.photos   || [];
+  if (!currentFamily) return;
+
+  var loads = [
+    // このご家族に関係するメッセージ（送信者または受信者）
+    db.collection(COLLECTIONS.MESSAGES)
+      .where('familyId', '==', currentFamily.id)
+      .orderBy('createdAt', 'asc').get(),
+    // この利用者への面会予約
+    db.collection(COLLECTIONS.VISITS)
+      .where('familyId', '==', currentFamily.id)
+      .orderBy('createdAt', 'desc').get(),
+    // 全員向けのお知らせ（broadcasts）
+    db.collection(COLLECTIONS.BROADCASTS)
+      .orderBy('createdAt', 'desc').limit(20).get(),
+    // 写真
+    db.collection(COLLECTIONS.PHOTOS)
+      .where('residentId', '==', currentFamily.residentId)
+      .orderBy('createdAt', 'desc').limit(50).get()
+  ];
+
+  Promise.all(loads)
+    .then(function(results) {
+      familyData.messages = results[0].docs.map(function(d) { return Object.assign({id: d.id}, d.data()); });
+      familyData.visits   = results[1].docs.map(function(d) { return Object.assign({id: d.id}, d.data()); });
+      familyData.notices  = results[2].docs.map(function(d) { return Object.assign({id: d.id}, d.data()); });
+      familyData.photos   = results[3].docs.map(function(d) { return Object.assign({id: d.id}, d.data()); });
       renderFamilyChat();
       renderFamilyVisits();
       renderFamilyNotices();
       renderFamilyPhotos();
     })
-    .catch(function() {});
+    .catch(function(err) { console.error('loadFamilyData error:', err); });
 }
 
 // ============================================================
@@ -123,13 +183,13 @@ function renderFamilyChat() {
     return;
   }
   wrap.innerHTML = familyData.messages.map(function(m) {
-    var isMine = m['送信者'] === currentFamily.name;
+    var isMine = m.sender === currentFamily.name;
     return '<div class="chat-bubble ' + (isMine ? 'mine' : '') + '">' +
       '<div class="chat-avatar">' + (isMine ? esc(currentFamily.name[0]) : 'S') + '</div>' +
       '<div class="chat-content">' +
-      '<div class="chat-name">' + esc(m['送信者']) + '</div>' +
-      '<div class="chat-text">' + esc(m['本文']).replace(/\n/g,'<br>') + '</div>' +
-      '<div class="chat-time">' + esc(String(m['送信日時'])) + '</div>' +
+      '<div class="chat-name">' + esc(m.sender) + '</div>' +
+      '<div class="chat-text">' + esc(m.body).replace(/\n/g,'<br>') + '</div>' +
+      '<div class="chat-time">' + fmtDate(m.createdAt) + '</div>' +
       '</div></div>';
   }).join('');
   wrap.scrollTop = wrap.scrollHeight;
@@ -138,18 +198,19 @@ function renderFamilyChat() {
 function familySendMessage() {
   var body = document.getElementById('family-msg-input').value.trim();
   if (!body) return;
-  callAPI('postMessage', {
+  db.collection(COLLECTIONS.MESSAGES).add({
     sender: currentFamily.name,
     receiver: currentFamily.staffName || '担当スタッフ',
-    message: body,
-    familyId: currentFamily.id
-  })
-  .then(function() {
+    body: body,
+    familyId: currentFamily.id,
+    isRead: false,
+    type: '家族',
+    createdAt: nowTimestamp()
+  }).then(function() {
     document.getElementById('family-msg-input').value = '';
     showToast('メッセージを送信しました');
     loadFamilyData();
-  })
-  .catch(function() { showToast('送信に失敗しました', 'error'); });
+  }).catch(function() { showToast('送信に失敗しました', 'error'); });
 }
 
 // ============================================================
@@ -162,16 +223,13 @@ function renderFamilyVisits() {
     return;
   }
   var listHtml = familyData.visits.slice().reverse().map(function(v) {
-    var st = v['ステータス'] || '';
-    var badgeClass = st === '申請中' ? 'badge-pending'
-                   : st === '承認'   ? 'badge-approved'
-                   : st === 'キャンセル' ? 'badge-cancel'
-                   : 'badge-rejected';
+    var st = v.status || '';
+    var badgeClass = st === '申請中' ? 'badge-pending' : st === '承認' ? 'badge-approved' : st === 'キャンセル' ? 'badge-cancel' : 'badge-rejected';
     return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)">' +
       '<span class="badge ' + badgeClass + '">' + esc(st) + '</span>' +
       '<div style="flex:1">' +
-        '<div style="font-weight:600;font-size:14px">' + formatDate(v['希望日']) + ' ' + esc(v['希望時間']) + '</div>' +
-        '<div style="font-size:12px;color:var(--gray-500)">' + esc(v['目的'] || v['備考'] || '') + ' / ' + esc(String(v['人数'] || '')) + '名</div>' +
+        '<div style="font-weight:600;font-size:14px">' + formatDate(v.visitDate) + ' ' + esc(v.visitTime) + '</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">' + esc(v.purpose||'') + ' / ' + esc(String(v.numPeople||'')) + '名</div>' +
       '</div>' +
       '</div>';
   }).join('');
@@ -181,7 +239,6 @@ function renderFamilyVisits() {
     '<strong>予約のキャンセルは施設へお電話ください。</strong><br>' +
     '<span style="font-size:12px;margin-top:4px;display:block">ご来院できなくなった場合は、お早めにご連絡いただけますと助かります。</span>' +
     '</div>';
-
   el.innerHTML = listHtml + cancelNote;
 }
 
@@ -203,17 +260,21 @@ function familyRequestVisit() {
 
   document.getElementById('confirm-ok-btn').onclick = function() {
     document.getElementById('visit-confirm-modal').style.display = 'none';
-    callAPI('requestVisit', {
-      applicant: currentFamily.name,
+    db.collection(COLLECTIONS.VISITS).add({
+      applicantName: currentFamily.name,
       residentName: currentFamily.residentName,
+      residentId: currentFamily.residentId,
       familyId: currentFamily.id,
-      date: date, time: time, people: people, purpose: purpose
-    })
-    .then(function() {
+      visitDate: date,
+      visitTime: time,
+      numPeople: parseInt(people) || 1,
+      purpose: purpose,
+      status: '申請中',
+      createdAt: nowTimestamp()
+    }).then(function() {
       showVisitComplete(dateStr, time, people, purpose);
       loadFamilyData();
-    })
-    .catch(function() { showToast('申請に失敗しました', 'error'); });
+    }).catch(function() { showToast('申請に失敗しました', 'error'); });
   };
 }
 
@@ -242,11 +303,11 @@ function renderFamilyNotices() {
     el.innerHTML = '<div class="empty-state"><i class="fa fa-bell-slash"></i><p>お知らせはありません</p></div>';
     return;
   }
-  el.innerHTML = familyData.notices.slice().reverse().map(function(n) {
+  el.innerHTML = familyData.notices.map(function(n) {
     return '<div class="notice-item">' +
-      '<div class="notice-title">' + esc(n['タイトル']) + '</div>' +
-      '<div class="notice-meta">' + esc(String(n['送信日時'])) + '</div>' +
-      '<div class="notice-body">' + esc(n['本文']).replace(/\n/g,'<br>') + '</div>' +
+      '<div class="notice-title">' + esc(n.title) + '</div>' +
+      '<div class="notice-meta">' + fmtDate(n.createdAt) + '</div>' +
+      '<div class="notice-body">' + esc(n.body).replace(/\n/g,'<br>') + '</div>' +
       '</div>';
   }).join('');
 }
@@ -260,14 +321,13 @@ function renderFamilyPhotos() {
     el.innerHTML = '<div class="empty-state"><i class="fa fa-image"></i><p>写真はまだありません</p></div>';
     return;
   }
-
   var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:4px">';
   familyData.photos.forEach(function(p) {
-    var url    = p['画像URL'] || p['url'] || '';
-    var date   = p['撮影日時'] || p['date'] || '';
-    var memo   = p['メモ'] || p['memo'] || '';
+    var url  = p.dataUrl || p.url || '';
+    var date = fmtDate(p.createdAt);
+    var memo = p.memo || '';
     if (!url) return;
-    html += '<div style="border-radius:10px;overflow:hidden;background:#f8fafc;box-shadow:0 2px 8px rgba(0,0,0,.07);cursor:pointer" onclick="openPhotoModal(\'' + url.replace(/'/g,"\\'") + '\',\'' + esc(date) + ' ' + esc(memo) + '\')">' +
+    html += '<div style="border-radius:10px;overflow:hidden;background:#f8fafc;box-shadow:0 2px 8px rgba(0,0,0,.07);cursor:pointer" onclick="openPhotoModal(\'' + url.substring(0,50).replace(/'/g,"\\'") + '...\',\'' + esc(date) + ' ' + esc(memo) + '\')">' +
       '<div style="width:100%;aspect-ratio:1/1;overflow:hidden">' +
         '<img src="' + url + '" alt="' + esc(memo) + '" style="width:100%;height:100%;object-fit:cover;transition:transform .2s" loading="lazy" onerror="this.parentNode.style.background=\'#e2e8f0\'">' +
       '</div>' +
@@ -290,19 +350,4 @@ function openPhotoModal(url, caption) {
 function closePhotoModal() {
   document.getElementById('photo-modal').style.display = 'none';
   document.getElementById('photo-modal-img').src = '';
-}
-
-// ============================================================
-// ユーティリティ
-// ============================================================
-function esc(str) {
-  if (str === undefined || str === null) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function formatDate(val) {
-  if (!val) return '';
-  var d = new Date(val);
-  if (isNaN(d.getTime())) return String(val);
-  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
 }

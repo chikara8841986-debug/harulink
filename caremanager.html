@@ -19,6 +19,13 @@
       </div>
       <form id="login-form" class="login-form">
         <div class="form-group">
+          <label>メールアドレス</label>
+          <div class="input-icon-wrap">
+            <i class="fa fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="登録されたメールアドレス" required>
+          </div>
+        </div>
+        <div class="form-group">
           <label>パスワード</label>
           <div class="input-icon-wrap">
             <i class="fa fa-lock"></i>
@@ -26,7 +33,7 @@
             <button type="button" class="toggle-pass" onclick="togglePass('login-pass')"><i class="fa fa-eye"></i></button>
           </div>
         </div>
-        <div id="login-error" class="login-error" style="display:none">パスワードが正しくありません</div>
+        <div id="login-error" class="login-error" style="display:none">メールアドレスまたはパスワードが正しくありません</div>
         <button type="submit" class="btn-login">ログイン <i class="fa fa-arrow-right"></i></button>
       </form>
       <div class="login-links">
@@ -73,6 +80,11 @@
   </div>
 
   <div id="toast-container"></div>
+  <!-- Firebase CDN SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="firebase.js"></script>
   <script src="caremanager.js"></script>
 </body>
 </html>
